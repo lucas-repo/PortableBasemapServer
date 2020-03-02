@@ -5,13 +5,11 @@ using ESRI.ArcGIS.Client;
 using System.IO;
 using System.Configuration;
 using System.Windows;
-using log4net.Util;
-using PBS.Service;
 
 namespace PBS.APP.Classes
 {
     /// <summary>
-    /// App操作类
+    /// App实用类
     /// </summary>
     public static class AppUtility
     {
@@ -23,26 +21,11 @@ namespace PBS.APP.Classes
         /// <returns></returns>
         public static string ReadConfig(string configKey, string defaultValue)
         {
-            System.Configuration.Configuration config = null;
             try
             {
-                config = ConfigurationManager.OpenExeConfiguration(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-                if (!config.HasFile)
-                {
-                    LogLog.Error("未找到配置文件："+ AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-                    throw new FileNotFoundException(Application.Current.FindResource("msgConfigFileNotExist")?.ToString());
-                }
+                return ConfigurationManager.AppSettings[configKey] == null ? defaultValue : ConfigurationManager.AppSettings[configKey];
             }
-            catch (Exception e)
-            {
-                MessageBox.Show(Application.Current.FindResource("msgConfigFileNotExist")?.ToString() + "\r\n" + e.Message, "", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown();
-            }
-            try
-            {
-                return config.AppSettings.Settings[configKey].Value == null ? defaultValue : config.AppSettings.Settings[configKey].Value;
-            }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return defaultValue;
             }

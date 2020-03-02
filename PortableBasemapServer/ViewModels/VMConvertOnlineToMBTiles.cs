@@ -399,7 +399,7 @@ namespace PBS.APP.ViewModels
                         PBS.Util.Geometry g = _downloadPolygon == null ? (PBS.Util.Geometry)new PBS.Util.Envelope(extent.XMin, extent.YMin, extent.XMax, extent.YMax) : _downloadPolygon;
                         if(_downloadPolygon!=null)
                             MessageBox.Show(App.Current.FindResource("msgDownloadByPolygonIntro").ToString(), "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        Datasource.ConvertToMBTiles(Output, Name, Description, Attribution, Levels, g, DoCompact); 
+                        Datasource.ConvertToMbTiles(Output, Name, Description, Attribution, Levels, g, DoCompact); 
                     }
                     catch (Exception e)
                     {

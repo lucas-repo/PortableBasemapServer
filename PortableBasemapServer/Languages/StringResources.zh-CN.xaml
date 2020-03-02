@@ -46,6 +46,7 @@
     <sys:String x:Key="chkboxDisableClientCache">禁用客户端缓存</sys:String>
     <sys:String x:Key="chkboxDisplayNoDataTile">显示&quot;NoData&quot;切片</sys:String>
     <sys:String x:Key="tbLocalIPAddress">本地IP地址:&#160;</sys:String>
+    <sys:String x:Key="tbTilesFormat">瓦片输出格式:</sys:String>
     <sys:String x:Key="tbArcGISRESTURL">ArcGIS REST URL:</sys:String>
     <sys:String x:Key="tbWMTSURL">OGC WMTS URL:</sys:String>
     <sys:String x:Key="btnCopyArcGIS">拷贝至剪贴板</sys:String>

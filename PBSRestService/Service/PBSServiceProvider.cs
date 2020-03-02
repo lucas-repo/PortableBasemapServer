@@ -230,7 +230,7 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                     }
                     else
                     {
-                        str = "only support json/pjson/jsapi format! for instance: http://hostname:port/PBS/rest/servicename/MapServer?f=json[pjson||jsapi]";
+                        str = "only support json/pjson/jsapi format! for instance: http://hostname:port/FMS/rest/servicename/MapServer?f=json[pjson||jsapi]";
                     }
                                                             if (callBack != null)
                     {

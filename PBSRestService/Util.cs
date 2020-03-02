@@ -283,7 +283,7 @@ namespace PBS.Util
                 fcb.DestinationPalette = BitmapPalettes.WebPaletteTransparent;
                 fcb.AlphaThreshold = 0.5;
                 fcb.EndInit();
-                //ref: http://192.168.0.106:8000/PBS/rest/services/BingMapsRoad/MapServer/tile/14/6208/13491
+                //ref: http://192.168.0.106:8000/FMS/rest/services/BingMapsRoad/MapServer/tile/14/6208/13491
                 //gray4pngencoder=14.5kb
                 //gray8pngencoder=21.5kb
                 //gray16pngencoder=36.9kb
@@ -336,7 +336,7 @@ namespace PBS.Util
                 g.Dispose();
                 BitmapSource bitmapSource = ConvertToBitmapSource(newBitmap);
                 
-                //http://192.168.100.109:8000/PBS/rest/services/GoogleMapsRoad/MapServer/tile/11/775/1686
+                //http://192.168.100.109:8000/FMS/rest/services/GoogleMapsRoad/MapServer/tile/11/775/1686
                 //pngencoder 79.5kb
                 //jpegencoder 32kb
                 JpegBitmapEncoder encoder = new JpegBitmapEncoder();
@@ -395,7 +395,7 @@ namespace PBS.Util
                 BitmapSource bitmapSource = ConvertToBitmapSource(newBitmap);
                 gdiBitmap.Dispose();
                 newBitmap.Dispose();
-                //http://192.168.100.109:8000/PBS/rest/services/GoogleMapsRoad/MapServer/tile/11/775/1686
+                //http://192.168.100.109:8000/FMS/rest/services/GoogleMapsRoad/MapServer/tile/11/775/1686
                 //pngencoder 79.5kb
                 //jpegencoder 32kb
                 JpegBitmapEncoder encoder = new JpegBitmapEncoder();

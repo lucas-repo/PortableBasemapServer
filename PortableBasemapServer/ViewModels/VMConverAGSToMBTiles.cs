@@ -168,7 +168,7 @@ namespace PBS.APP.ViewModels
                     IsIdle = false;
                     try
                     {
-                        Datasource.ConvertToMBTiles(Output, Name, Description, Attribution,DoCompact);
+                        Datasource.ConvertToMbTiles(Output, Name, Description, Attribution,DoCompact);
                     }
                     catch (Exception e)
                     {

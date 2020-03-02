@@ -84,7 +84,7 @@ namespace PBS.DataSource
             }
             this.TilingScheme = TilingSchemePostProcess(tilingScheme);
 
-            this.TilingScheme.CacheTileFormat = ImageFormat.JPG;
+            this.TilingScheme.CacheTileFormat = ImageFormat.PNG;
         }
 
         public override byte[] GetTileBytes(int level, int row, int col)

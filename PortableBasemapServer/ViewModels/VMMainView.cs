@@ -246,8 +246,41 @@ namespace PBS.APP.ViewModels
                 ServiceManager.IPAddress = _valueIPAddress;
                 NotifyPropertyChanged(p => p.ValueIPAddress);
             }
-        }        
-	    #endregion
+        }
+
+        private MTObservableCollection<string> _tilesFormat = new MTObservableCollection<string>();
+        /// <summary>
+        /// binding to datasourcetypes combobox
+        /// </summary>
+        public MTObservableCollection<string> TilesFormat
+        {
+            get
+            {
+                return _tilesFormat;
+            }
+             set
+            {
+                _ipAddresses = value;
+                NotifyPropertyChanged(p => p._tilesFormat);
+            }
+        }
+
+        private string _valueTilesFormat;
+        public string ValueTilesFormat
+        {
+            get
+            {
+                return _valueTilesFormat;
+            }
+            set
+            {
+                _valueTilesFormat = value;
+                ServiceManager.TilesFormat = _valueTilesFormat;
+                NotifyPropertyChanged(p => p.ValueTilesFormat);
+            }
+        }
+
+        #endregion
         #region UI related
         private bool _isMemCacheEnabled;
         /// <summary>
@@ -275,6 +308,21 @@ namespace PBS.APP.ViewModels
                 NotifyPropertyChanged(p => p.StrMemCacheMenuHeader);
             }
         }
+
+        private string tilesFormat;
+        /// <summary>
+        /// binding to text of tbTilesFormat
+        /// </summary>
+        public string StrTilesFormat
+        {
+            get { return tilesFormat; }
+            set
+            {
+                tilesFormat = value;
+                NotifyPropertyChanged(p => p.StrTilesFormat);
+            }
+        }
+
         private string _strURLArcGIS;
         /// <summary>
         /// binding to text of textboxServiceArcGIS
@@ -440,8 +488,11 @@ namespace PBS.APP.ViewModels
         /// </summary>
         /// <param name="bindToUI">if true, this instance is intended to bind to MainWindow, and do ui related initialization jobs. otherwise, instance started without ui related initialization.</param>
         public VMMainView()
-        {            
+        {
             #region app init
+            TilesFormat.Add("PNG");
+            TilesFormat.Add("JPG");
+
             //data source type of service
             foreach (DataSourceTypePredefined t in Enum.GetValues(typeof(DataSourceTypePredefined)))
             {
@@ -919,10 +970,12 @@ namespace PBS.APP.ViewModels
                         IsDisableClientCache,
                         IsDisplayNoDataTile,
                         (VisualStyle)Enum.Parse(typeof(VisualStyle), ValueVisualStyle, true),
-                        ValueTilingSchemeFilePath);
+                        ValueTilingSchemeFilePath,
+                        ValueTilesFormat);
                 }
                 else
                 {
+                    string str = ValueTilesFormat;
                     result = ServiceManager.CreateService(
                         ValueServiceName,
                         int.Parse(ValueServicePort),
@@ -931,7 +984,9 @@ namespace PBS.APP.ViewModels
                         IsAllowMemoryCache,
                         IsDisableClientCache,
                         IsDisplayNoDataTile,
-                        (VisualStyle)Enum.Parse(typeof(VisualStyle), ValueVisualStyle, true));
+                        (VisualStyle)Enum.Parse(typeof(VisualStyle), ValueVisualStyle, true),
+                        null, 
+                        str);
                 }
                 if (result != string.Empty)
                 {
@@ -1089,9 +1144,12 @@ namespace PBS.APP.ViewModels
             }
             else
             {
+                
                 IsDataSourcePathTBEnabled = false;
                 ValueServiceName = ValueDataSourceType;
-                IsServiceNameTBEnabled = false;
+
+                //gisweis:自定义服务名称
+                //IsServiceNameTBEnabled = false;
             }
             //data source path browse button's availability
             if (ValueDataSourceType == DataSourceTypePredefined.MobileAtlasCreator.ToString() ||

@@ -54,7 +54,7 @@ namespace PBS.Service
         /// <param name="disableClientCache"></param>
         /// <param name="displayNodataTile"></param>
         /// <param name="tilingSchemePath">Set this parameter only when type is ArcGISDynamicMapService||RasterDataset and do not use Google Maps's tiling scheme</param>
-        public PBSService(string serviceName, string dataSourcePath, int port, string strType, bool allowmemcache, bool disableClientCache, bool displayNodataTile, VisualStyle style, string tilingSchemePath)
+        public PBSService(string serviceName, string dataSourcePath, int port, string strType, bool allowmemcache, bool disableClientCache, bool displayNodataTile, VisualStyle style, string tilingSchemePath,string tileFormat = "JPG")
         {
             ServiceName = serviceName;
             if (!DataSourceBase.IsOnlineMaps(strType))
@@ -116,7 +116,7 @@ namespace PBS.Service
                 }
                 if (!known)
                     throw new Exception(strType + " is not a known data source type.");
-                DataSource = new DataSourceCustomOnlineMaps(strType)
+                DataSource = new DataSourceCustomOnlineMaps(strType, tileFormat)
                 {
                     IsOnlineMap=true
                 };
@@ -131,7 +131,7 @@ namespace PBS.Service
             LogInfo = new Log();
             if(string.IsNullOrEmpty(ServiceManager.IPAddress))
                 throw new Exception("IPAddress is null or empty when creating PBS service!");
-            UrlArcGIS = "http://" + ServiceManager.IPAddress + ":" + Port + "/PBS/rest/services/" + ServiceName + "/MapServer";
+            UrlArcGIS = "http://" + ServiceManager.IPAddress + ":" + Port + "/FMS/rest/services/" + ServiceName + "/MapServer";
         }
 
         public void Dispose()

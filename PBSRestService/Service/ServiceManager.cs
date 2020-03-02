@@ -47,6 +47,8 @@ namespace PBS.Service
         /// </summary>
         public static MemCache Memcache { get; set; }
 
+        public static string TilesFormat { get; set; }
+
         public static string StartServiceHost(int port)
         {
             if (Services == null)
@@ -106,8 +108,9 @@ namespace PBS.Service
         /// <param name="displayNoDataTile"></param>
         /// <param name="style"></param>
         /// <param name="tilingSchemePath">Set this parameter only when type is ArcGISDynamicMapService and do not use Google Maps's tiling scheme</param>
+        /// <param name="tileFormat"></param>
         /// <returns>errors or warnings. string.empty if nothing wrong.</returns>
-        public static string CreateService(string name, int port, string strType, string dataSorucePath,bool allowMemoryCache, bool disableClientCache, bool displayNoDataTile,VisualStyle style,string tilingSchemePath=null)
+        public static string CreateService(string name, int port, string strType, string dataSorucePath,bool allowMemoryCache, bool disableClientCache, bool displayNoDataTile,VisualStyle style,string tilingSchemePath=null,string tileFormat="JPG")
         {
             PBSServiceProvider serviceProvider = null;
             string str;
@@ -127,7 +130,7 @@ namespace PBS.Service
             PBSService service;
             try
             {
-                service = new PBSService(name, dataSorucePath, port, strType,allowMemoryCache,disableClientCache,displayNoDataTile,style,tilingSchemePath);
+                service = new PBSService(name, dataSorucePath, port, strType,allowMemoryCache,disableClientCache,displayNoDataTile,style,tilingSchemePath, tileFormat);
             }
             catch (Exception e)//in case of reading conf.xml or conf.cdi file error|| reading a sqlite db error
             {
@@ -186,7 +189,7 @@ namespace PBS.Service
             ht.Add("tilingSchemePath", tilingSchemePath);
             byte[] postData = Encoding.UTF8.GetBytes(JSON.JsonEncode(ht));
 
-            HttpWebRequest myReq = WebRequest.Create("http://192.168.26.128:7080/PBS/rest/admin/addService") as HttpWebRequest;
+            HttpWebRequest myReq = WebRequest.Create("http://192.168.26.128:7080/FMS/rest/admin/addService") as HttpWebRequest;
             myReq.Method = "POST";
             string username = "esrichina";
             string password = "esrichina";

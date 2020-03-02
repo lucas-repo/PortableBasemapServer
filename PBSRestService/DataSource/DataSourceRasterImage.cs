@@ -53,7 +53,8 @@ namespace PBS.DataSource
 
             try
             {                
-                Gdal.AllRegister();                
+                Gdal.AllRegister();
+                Gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
             }
             catch (Exception e)
             {
@@ -73,14 +74,14 @@ namespace PBS.DataSource
             if (ds.RasterCount < 3)
             {
                 throw new Exception("The number of the raster bands is not enough.(bands count must = 3)");
-            }            
+            }
             //提取两个sp第一个,之前的字符串中的所有字母和数字，判断是否想等
-            ////if (ds.GetProjectionRef() != string.Empty)//GetProjectionRef() can't be trust
-            ////{
-            ////    HasProjectionFromGDAL = true;
-            ////    if (!string.Equals(Regex.Replace(TilingScheme.WKT.Split(new char[] { ',' })[0], @"[^a-zA-Z0-9]", ""), Regex.Replace(ds.GetProjectionRef().Split(new char[] { ',' })[0], @"[^a-zA-Z0-9]", "")))
-            ////        throw new Exception("The spatial reference in TilingScheme file is not equal to the spatial reference of Raster file!\r\nReprojection is not supported.");
-            ////}
+            if (ds.GetProjectionRef() != string.Empty)//GetProjectionRef() can't be trust
+            {
+                HasProjectionFromGDAL = true;
+                if (!string.Equals(Regex.Replace(TilingScheme.WKT.Split(new char[] { ',' })[0], @"[^a-zA-Z0-9]", ""), Regex.Replace(ds.GetProjectionRef().Split(new char[] { ',' })[0], @"[^a-zA-Z0-9]", "")))
+                    throw new Exception("The spatial reference in TilingScheme file is not equal to the spatial reference of Raster file!\r\nReprojection is not supported.");
+            }
             else
             {
                 HasProjectionFromGDAL = false;

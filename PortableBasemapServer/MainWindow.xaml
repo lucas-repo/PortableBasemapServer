@@ -37,12 +37,12 @@
             <StackPanel>
                 <!--parameters-->
                 <StackPanel Background="SkyBlue">
-                   <!--Tile Source Type-->
+                    <!--Tile Source Type-->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{DynamicResource tbDataSourceType}" Padding="0,0,10,0" VerticalAlignment="Center" />
-                        <ComboBox x:Name="cmbboxDataSourceType" Width="Auto" ItemsSource="{Binding DataSourceTypes,Mode=OneWay}" SelectedItem="{Binding ValueDataSourceType,Mode=TwoWay}" />
+                        <ComboBox  x:Name="cmbboxDataSourceType" Width="Auto" ItemsSource="{Binding DataSourceTypes,Mode=OneWay}" SelectedItem="{Binding ValueDataSourceType,Mode=TwoWay}" />
                         <Button x:Name="btnArcGISDynamicMapServiceParams" Content="{DynamicResource btnArcGISDynamicMapServiceParams}" Visibility="{Binding IsAGSDMSParamsButtonVisible,Mode=OneWay}" Command="{Binding CMDArcGISDynamicMapServiceParams}"/>
-                    </StackPanel>                    
+                    </StackPanel>
                     <!--Tile Source Path-->
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -98,7 +98,7 @@
                     <StackPanel Orientation="Horizontal" Height="24">
                         <CheckBox x:Name="chkboxAllowMemoryCache" Content="{DynamicResource chkboxAllowMemoryCache}" VerticalAlignment="Center" Margin="0,0,0,0" IsChecked="{Binding IsAllowMemoryCache,Mode=TwoWay}" />
                         <CheckBox x:Name="chkboxDisableClientCache" Content="{DynamicResource chkboxDisableClientCache}" VerticalAlignment="Center" Margin="20,0,0,0" IsChecked="{Binding IsDisableClientCache,Mode=TwoWay}" />
-                        <CheckBox x:Name="chkboxDisplayNoDataTile" Content="{DynamicResource chkboxDisplayNoDataTile}" VerticalAlignment="Center" Margin="20,0,0,0" IsChecked="{Binding IsDisplayNoDataTile,Mode=TwoWay}" />                        
+                        <CheckBox x:Name="chkboxDisplayNoDataTile" Content="{DynamicResource chkboxDisplayNoDataTile}" VerticalAlignment="Center" Margin="20,0,0,0" IsChecked="{Binding IsDisplayNoDataTile,Mode=TwoWay}" />
                     </StackPanel>
                 </StackPanel>
                 <!--service addresses-->
@@ -107,7 +107,10 @@
                         <!--ip address-->
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{DynamicResource tbLocalIPAddress}" VerticalAlignment="Center" />
-                            <ComboBox x:Name="cmbboxIPAddress" Width="150" ItemsSource="{Binding IPAddresses,Mode=OneWay}" SelectedItem="{Binding ValueIPAddress,Mode=TwoWay}" />
+                            <ComboBox x:Name="cmbboxIPAddress" Width="150" ItemsSource="{Binding IPAddresses,Mode=OneWay}"  Text="{Binding ValueIPAddress,Mode=TwoWay}" IsEditable="True"/>
+                            <TextBlock Text="{DynamicResource tbTilesFormat}" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbboxTilesFormat" Width="60" ItemsSource="{Binding TilesFormat,Mode=OneWay}"  SelectedItem="{Binding ValueTilesFormat,Mode=TwoWay}" />
+
                         </StackPanel>
                         <!--arcgis rest url-->
                         <Grid>
@@ -131,9 +134,10 @@
                             <TextBox Grid.Column="1" x:Name="textboxServiceWMTS" Text="{Binding StrURLWMTS,Mode=OneWay}" IsReadOnly="True" />
                             <Button Grid.Column="2" x:Name="btnCopyWMTS" Content="{DynamicResource btnCopyArcGIS}" Command="{Binding CMDClickCopyUrlButton}" CommandParameter="WMTS" />
                         </Grid>
-                    </StackPanel>                    
+
+                    </StackPanel>
                 </DockPanel>
-            </StackPanel>            
+            </StackPanel>
         </Grid>
         <!--<GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />-->
         <!--Button Row-->

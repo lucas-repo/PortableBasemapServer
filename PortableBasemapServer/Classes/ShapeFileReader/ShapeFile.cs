@@ -271,11 +271,11 @@ namespace Vishcious.ArcGIS.SLContrib
                     throw new InvalidOperationException( "The number of records in the DBF files does not match the number of records in the SHP file." );
 
                 //Read all the dbf fields info
-                List<DBFField> DBFFields = new List<DBFField>();
+                List<DbfField> DBFFields = new List<DbfField>();
                 while( read.PeekChar() != 0x0D )
                 {
                     //The Field info is 32 bytes in length
-                    DBFField field = new DBFField();
+                    DbfField field = new DbfField();
                     field.FieldName = Encoding.UTF8.GetString( read.ReadBytes( 11 ), 0, 11 ).Replace( "\0", "" ).ToLower();
                     field.FieldType = read.ReadByte();
                     //Field type: 
@@ -320,7 +320,7 @@ namespace Vishcious.ArcGIS.SLContrib
                     byte[] recordContent = read.ReadBytes( RecordLength );
                     Dictionary<string, object> row = new Dictionary<string, object>();
                     int currentIndex = 1;
-                    foreach( DBFField field in DBFFields )
+                    foreach( DbfField field in DBFFields )
                     {
                         string temp = Encoding.UTF8.GetString( recordContent, currentIndex, field.FieldLengthInBytes );
                         currentIndex = currentIndex + field.FieldLengthInBytes;
@@ -380,11 +380,11 @@ namespace Vishcious.ArcGIS.SLContrib
                 ushort reserved2 = read.ReadUInt16();
 
                 //Read all the dbf fields info
-                List<DBFField> DBFFields = new List<DBFField>();
+                List<DbfField> DBFFields = new List<DbfField>();
                 while( read.PeekChar() != 0x0D )
                 {
                     //The Field info is 32 bytes in length
-                    DBFField field = new DBFField();
+                    DbfField field = new DbfField();
                     field.FieldName = Encoding.UTF8.GetString( read.ReadBytes( 11 ), 0, 11 ).Replace( "\0", "" ).ToLower();
                     field.FieldType = read.ReadByte();
                     //Field type: 
@@ -429,7 +429,7 @@ namespace Vishcious.ArcGIS.SLContrib
                     byte[] recordContent = read.ReadBytes( RecordLength );
                     Dictionary<string, object> row = new Dictionary<string, object>();
                     int currentIndex = 1;
-                    foreach( DBFField field in DBFFields )
+                    foreach( DbfField field in DBFFields )
                     {
                         string temp = Encoding.UTF8.GetString( recordContent, currentIndex, field.FieldLengthInBytes );
                         temp = temp.Trim();

@@ -48,6 +48,7 @@
     <sys:String x:Key="chkboxDisableClientCache">DisableClientCache</sys:String>
     <sys:String x:Key="chkboxDisplayNoDataTile">Display&quot;NoData&quot;Tile</sys:String>
     <sys:String x:Key="tbLocalIPAddress">Local IP Address:</sys:String>
+    <sys:String x:Key="tbTilesFormat">Tiles Format:</sys:String>
     <sys:String x:Key="tbArcGISRESTURL">ArcGIS REST URL:</sys:String>
     <sys:String x:Key="tbWMTSURL">OGC WMTS URL:</sys:String>
     <sys:String x:Key="btnCopyArcGIS">Copy to Clipboard</sys:String>

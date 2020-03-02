@@ -1,17 +1,7 @@
-﻿//****************************************
-//Copyright@diligentpig, https://geopbs.codeplex.com
-//Please using source code under LGPL license.
-//****************************************
+﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using System.IO;
 using PBS.Util;
-using System.Data.SQLite;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace PBS.DataSource
 {
@@ -134,7 +124,7 @@ namespace PBS.DataSource
         /// <param name="description">A description of the tiles as plain text., required by MBTiles.</param>
         /// <param name="attribution">An attribution string, which explains in English (and HTML) the sources of data and/or style for the map., required by MBTiles.</param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        public void ConvertToMBTiles(string outputPath, string name, string description, string attribution,bool doCompact)
+        public void ConvertToMbTiles(string outputPath, string name, string description, string attribution,bool doCompact)
         {
             DirectoryInfo[] directories = new DirectoryInfo(Path + "\\_alllayers").GetDirectories("L*");
             int[] levels = new int[directories.Length];
@@ -176,7 +166,7 @@ namespace PBS.DataSource
         /// <param name="levels"></param>
         /// <param name="geometry"></param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        public void ConvertToMBTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact)
+        public void ConvertToMbTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact)
         {
             throw new NotImplementedException();
         }

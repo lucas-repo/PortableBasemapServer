@@ -1,7 +1,4 @@
-﻿//****************************************
-//Copyright@diligentpig, https://geopbs.codeplex.com
-//Please using source code under LGPL license.
-//****************************************
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,38 +15,44 @@ using System.Collections.Concurrent;
 
 namespace PBS.DataSource
 {
+    /// <summary>
+    /// 数据源基类
+    /// </summary>
     public abstract class DataSourceBase
     {
+        /// <summary>
+        /// 析构函数
+        /// </summary>
         ~DataSourceBase()
         {
-            if (_connLocalCacheFile != null)
-                _connLocalCacheFile.Close();
+            _connLocalCacheFile?.Close();
             _connLocalCacheFile = null;
         }
         /// <summary>
-        /// including predefined datasourcetype and custom online maps.
+        /// 数据类型
         /// </summary>
         public string Type { get; set; }
+        
         /// <summary>
-        /// data source path
+        /// 数据源路径
         /// </summary>
         public string Path { get; set; }
+
         /// <summary>
         /// to store some metadata about service
         /// </summary>
         public TilingScheme TilingScheme { get; set; }
+        
         /// <summary>
-        /// Indicate if this datasource is Online Map.
-        /// several methods which heavily frequent load depends on this property.
+        /// 是否为在线地图
         /// </summary>
         public bool IsOnlineMap { get; set; }
 
         /// <summary>
-        /// TODO: Initialize properties of DataSourceBase && generate tiling scheme
+        /// 初始化
         /// </summary>
         protected virtual void Initialize(string path)
         {
-            //TODO:set type
             this.Path = path;
             TilingScheme ts;
             try
@@ -200,7 +203,7 @@ namespace PBS.DataSource
                     }
                     else
                     {
-                        tilingScheme.CacheTileFormat = ImageFormat.JPG;
+                        tilingScheme.CacheTileFormat = ImageFormat.PNG;
                     }
                 }
             }
@@ -284,7 +287,7 @@ namespace PBS.DataSource
             tilingScheme.Path = path;//record the full tiling scheme file path
             //read conf.xml
             XElement confXml = XElement.Load(System.IO.Path.GetDirectoryName(path) + @"\\conf.xml");
-            tilingScheme.WKT = confXml.Element("TileCacheInfo").Element("SpatialReference").Element("WKT").Value;
+            tilingScheme.WKT = confXml.Element("TileCacheInfo").Element("SpatialReference").Element("WKT")?.Value;
             if (confXml.Element("TileCacheInfo").Element("SpatialReference").Element("WKID") != null)
                 tilingScheme.WKID = int.Parse(confXml.Element("TileCacheInfo").Element("SpatialReference").Element("WKID").Value);
             else
@@ -472,7 +475,7 @@ namespace PBS.DataSource
             StringBuilder sb;
             #region Google/Bing maps tiling scheme
             tilingScheme.Path = "N/A";
-            tilingScheme.CacheTileFormat = ImageFormat.JPG;
+            tilingScheme.CacheTileFormat = ImageFormat.PNG;
             tilingScheme.CompressionQuality = 75;
             tilingScheme.DPI = 96;
             //LODs
@@ -830,18 +833,10 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                 }
             }
         }
-        #endregion
-
-        #region IFormatConverter
-        private ConvertStatus _convertingStatus;
         /// <summary>
         /// cache format converting status
         /// </summary>
-        public ConvertStatus ConvertingStatus
-        {
-            get { return _convertingStatus; }
-            protected set { _convertingStatus = value; }
-        }
+        public ConvertStatus ConvertingStatus { get; protected set; }
         #region ToMBTiles
         private string _outputFile;
         //using for multi threading
@@ -866,13 +861,13 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
         {
             _outputFile = outputPath;
             _downloadGeometry = geometry;
-            _convertingStatus.IsInProgress = true;
+            ConvertingStatus.IsInProgress = true;
             try
             {
                 CreateMBTilesFileAndWriteMetaData(outputPath, name, description, attribution, geometry);
                 #region calculate startCol/Row and endCol/Row and tiles count of each level
                 int constTileSize = 256;
-                _convertingStatus.TotalCount = 0;
+                ConvertingStatus.TotalCount = 0;
                 string[] keyTileInfos = new string[levels.Length];
                 int[] tilesCountOfLevel = new int[levels.Length];
                 for (int i = 0; i < levels.Length; i++)
@@ -885,9 +880,9 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                     int endTileCol = (int)(Math.Abs(TilingScheme.TileOrigin.X - geometry.Extent.XMax) / oneTileDistance);
                     keyTileInfos[i] = string.Format("{0},{1},{2},{3}", startTileRow, startTileCol, endTileRow, endTileCol);
                     tilesCountOfLevel[i] = Math.Abs((endTileCol - startTileCol + 1) * (endTileRow - startTileRow + 1));
-                    _convertingStatus.TotalCount += tilesCountOfLevel[i];
+                    ConvertingStatus.TotalCount += tilesCountOfLevel[i];
                 }
-                _totalCount = _convertingStatus.TotalCount;
+                _totalCount = ConvertingStatus.TotalCount;
                 _completeCount = _errorCount = 0;
                 #endregion
                 for (int i = 0; i < levels.Length; i++)
@@ -898,34 +893,34 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                     startC = int.Parse(keyTileInfos[i].Split(new char[] { ',' })[1]);
                     endR = int.Parse(keyTileInfos[i].Split(new char[] { ',' })[2]);
                     endC = int.Parse(keyTileInfos[i].Split(new char[] { ',' })[3]);
-                    _convertingStatus.Level = level;
-                    _convertingStatus.LevelTotalCount = tilesCountOfLevel[i];
-                    _convertingStatus.LevelCompleteCount = _convertingStatus.LevelErrorCount = 0;
-                    _levelTotalCount = _convertingStatus.LevelTotalCount;
+                    ConvertingStatus.Level = level;
+                    ConvertingStatus.LevelTotalCount = tilesCountOfLevel[i];
+                    ConvertingStatus.LevelCompleteCount = ConvertingStatus.LevelErrorCount = 0;
+                    _levelTotalCount = ConvertingStatus.LevelTotalCount;
                     _levelCompleteCount = _levelErrorCount = 0;           
                     SaveOneLevelTilesToMBTiles(level, startR, startC, endR, endC);
-                    if (_convertingStatus.IsCancelled)
+                    if (ConvertingStatus.IsCancelled)
                     {
-                        _convertingStatus.IsCompletedSuccessfully = false;
+                        ConvertingStatus.IsCompletedSuccessfully = false;
                         break;
                     }
                 }
                 if (doCompact)
                 {
-                    _convertingStatus.IsDoingCompact = true;
-                    _convertingStatus.SizeBeforeCompact = new FileInfo(_outputFile).Length;
+                    ConvertingStatus.IsDoingCompact = true;
+                    ConvertingStatus.SizeBeforeCompact = new FileInfo(_outputFile).Length;
                     CompactMBTiles(_outputFile);
-                    _convertingStatus.IsDoingCompact = false;
-                    _convertingStatus.SizeAfterCompact = new FileInfo(_outputFile).Length;
+                    ConvertingStatus.IsDoingCompact = false;
+                    ConvertingStatus.SizeAfterCompact = new FileInfo(_outputFile).Length;
                 }
-                if (!_convertingStatus.IsCancelled)
-                    _convertingStatus.IsCompletedSuccessfully = true;
+                if (!ConvertingStatus.IsCancelled)
+                    ConvertingStatus.IsCompletedSuccessfully = true;
             }
             finally
             {
-                _convertingStatus.IsInProgress = false;
-                _convertingStatus.IsCommittingTransaction = false;
-                _convertingStatus.IsDoingCompact = false;
+                ConvertingStatus.IsInProgress = false;
+                ConvertingStatus.IsCommittingTransaction = false;
+                ConvertingStatus.IsDoingCompact = false;
             }
         }
 
@@ -975,7 +970,7 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                 List<Task> tasks = new List<Task>();
                 for (int i = startBundleIndex; i <= endBundleIndex; i++)
                 {
-                    if (_convertingStatus.IsCancelled)
+                    if (ConvertingStatus.IsCancelled)
                         return;
                     Bundle b = allBundles[i];
                     int startR = startRowLevel > b.StartTileRow ? startRowLevel : b.StartTileRow;
@@ -985,7 +980,7 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                     Task t = Task.Factory.StartNew(() => { WriteTilesToSqlite(GetTilesByExtent(level, startR, startC, endR, endC)); }, _cts.Token);
                     tasks.Add(t);
                 }
-                _convertingStatus.ThreadCount = tasks.Count;
+                ConvertingStatus.ThreadCount = tasks.Count;
                 try
                 {
                     Task.WaitAll(tasks.ToArray());
@@ -1001,7 +996,7 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
         /// </summary>
         protected void CancelDoConvertToMBTiles()
         {
-            _convertingStatus.IsCancelled = true;
+            ConvertingStatus.IsCancelled = true;
             _cts.Cancel();
         }
 
@@ -1026,14 +1021,14 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                     {
                         dict.Add(string.Format("{0}/{1}/{2}", level, c, r), bytes);
                         
-                        _convertingStatus.LevelCompleteCount = Interlocked.Increment(ref _levelCompleteCount);
-                        _convertingStatus.CompleteCount = Interlocked.Increment(ref _completeCount);
-                        _convertingStatus.CompleteTotalBytes = Interlocked.Add(ref _completeTotalBytes, bytes.Length);
+                        ConvertingStatus.LevelCompleteCount = Interlocked.Increment(ref _levelCompleteCount);
+                        ConvertingStatus.CompleteCount = Interlocked.Increment(ref _completeCount);
+                        ConvertingStatus.CompleteTotalBytes = Interlocked.Add(ref _completeTotalBytes, bytes.Length);
                     }
                     else
                     {
-                        _convertingStatus.LevelErrorCount = Interlocked.Increment(ref _levelErrorCount);
-                        _convertingStatus.ErrorCount = Interlocked.Increment(ref _errorCount);
+                        ConvertingStatus.LevelErrorCount = Interlocked.Increment(ref _levelErrorCount);
+                        ConvertingStatus.ErrorCount = Interlocked.Increment(ref _errorCount);
                     }
 #if Debug
                     System.Diagnostics.Debug.WriteLine(_convertingStatus.LevelCompleteCount + " / " + _convertingStatus.LevelTotalCount + "  |||  " + level + "/" + r + "/" + c + "thread:" + Thread.CurrentThread.ManagedThreadId);
@@ -1079,9 +1074,9 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        _convertingStatus.IsCommittingTransaction = true;
+                        ConvertingStatus.IsCommittingTransaction = true;
                         transaction.Commit();
-                        _convertingStatus.IsCommittingTransaction = false;
+                        ConvertingStatus.IsCommittingTransaction = false;
                     }
                     finally
                     {
@@ -1295,10 +1290,13 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
         TianDiTuMap,
     }
 
+    /// <summary>
+    /// 瓦片方案
+    /// </summary>
     public class TilingScheme
     {
         /// <summary>
-        /// tiling scheme file path
+        /// 路径
         /// </summary>
         public string Path { get; set; }
         public string RestResponseArcGISJson { get; set; }
@@ -1325,20 +1323,47 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
         public int DPI { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class LODInfo
     {
+        /// <summary>
+        /// 级别
+        /// </summary>
         public int LevelID { get; set; }
+        /// <summary>
+        /// 比例尺
+        /// </summary>
         public double Scale { get; set; }
+        /// <summary>
+        /// 分辨率
+        /// </summary>
         public double Resolution { get; set; }
     }
 
+    /// <summary>
+    /// 存储类型
+    /// </summary>
     public enum StorageFormat
     {
+        /// <summary>
+        /// ArcGIS松散型
+        /// </summary>
         esriMapCacheStorageModeExploded,
+        /// <summary>
+        /// ArcGIS紧凑型
+        /// </summary>
         esriMapCacheStorageModeCompact,
-        unknown//ArcGISTiledMapService doesn't expose this property
+        /// <summary>
+        /// 未知
+        /// </summary>
+        unknown
     }
 
+    /// <summary>
+    /// 图片格式
+    /// </summary>
     public enum ImageFormat
     {
         PNG,
@@ -1350,22 +1375,49 @@ FROM map JOIN images ON images.tile_id = map.tile_id";
         MIXED
     }
 
+    /// <summary>
+    /// 瓦片加载参数
+    /// </summary>
     public class TileLoadEventArgs : EventArgs
     {
+        /// <summary>
+        /// 级别
+        /// </summary>
         public int Level { get; set; }
+        /// <summary>
+        /// 列号
+        /// </summary>
         public int Column { get; set; }
+        /// <summary>
+        /// 行号
+        /// </summary>
         public int Row { get; set; }
+        /// <summary>
+        /// 瓦片字节
+        /// </summary>
         public byte[] TileBytes { get; set; }
+        /// <summary>
+        /// 瓦片生成方式
+        /// </summary>
         public TileGeneratedSource GeneratedMethod { get; set; }
     }
 
     /// <summary>
-    /// by which means the tile bytes generated
+    /// 瓦片生成方式
     /// </summary>
     public enum TileGeneratedSource
     {
+        /// <summary>
+        /// 动态输出
+        /// </summary>
         DynamicOutput,
+        /// <summary>
+        /// 从内存
+        /// </summary>
         FromMemcached,
+        /// <summary>
+        /// 从文件
+        /// </summary>
         FromFileCache
     }
 }

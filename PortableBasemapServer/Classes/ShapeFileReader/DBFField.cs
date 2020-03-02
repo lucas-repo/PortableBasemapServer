@@ -11,19 +11,26 @@ using System.Windows.Shapes;
 
 namespace Vishcious.ArcGIS.SLContrib
 {
-    public class DBFField
+    public class DbfField
     {
+        /// <summary>
+        /// 字段名称
+        /// </summary>
         public string FieldName
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// 字段类型
+        /// </summary>
         public byte FieldType
         {
             get;
             set;
         }
+
 
         public uint FieldDataAddress
         {

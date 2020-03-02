@@ -297,20 +297,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rd /s /q "$(SolutionDir)output"
-md "$(SolutionDir)output"
-xcopy /y /e /r "$(SolutionDir)copying\*.*" "$(SolutionDir)output"
-rem delete extra folders and files from 'copying' project
-rd /s /q "$(SolutionDir)output\obj"
-rd /s /q "$(SolutionDir)output\bin"
-del /f /q "$(SolutionDir)output\copying.*"
-
-xcopy /y /r "$(SolutionDir)using\*.dll" "$(SolutionDir)output"
-
-xcopy /y /r "$(TargetDir)PBS.dll" "$(SolutionDir)output"
-xcopy /y /r "$(TargetDir)log4net.config" "$(SolutionDir)output"
-xcopy /y /r "$(TargetDir)PortableBasemapServer.exe" "$(SolutionDir)output"
-xcopy /y /r "$(TargetDir)PortableBasemapServer.exe.config" "$(SolutionDir)output"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>xcopy /y /e /r "$(SolutionDir)copying\*.*" "$(TargetDir)"

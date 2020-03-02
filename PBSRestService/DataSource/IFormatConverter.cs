@@ -26,7 +26,7 @@ namespace PBS.DataSource
         /// <param name="levels">tiles in which levels to convert to mbtiles.</param>
         /// <param name="geometry">convert/download extent, sr=3857.If this is Envelope, download by rectangle, if this is polygon, download by polygon's shape.</param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        void ConvertToMBTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact);
+        void ConvertToMbTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact);
 
         /// <summary>
         /// Convert to MBTiles format.
@@ -36,7 +36,7 @@ namespace PBS.DataSource
         /// <param name="description">A description of the tiles as plain text., required by MBTiles.</param>
         /// <param name="attribution">An attribution string, which explains in English (and HTML) the sources of data and/or style for the map., required by MBTiles.</param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        void ConvertToMBTiles(string outputPath, string name, string description, string attribution, bool doCompact);
+        void ConvertToMbTiles(string outputPath, string name, string description, string attribution, bool doCompact);
 
         /// <summary>
         /// Cancel any pending converting progress, and fire the ConvertCancelled event  when cancelled successfully.

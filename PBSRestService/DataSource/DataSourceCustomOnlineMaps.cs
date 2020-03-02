@@ -5,20 +5,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Net;
 using System.IO;
 using System.Xml.Linq;
 using PBS.Util;
-using System.Data.SQLite;
-using PBS.Service;
-using System.Diagnostics;
 
 namespace PBS.DataSource
 {
     public class DataSourceCustomOnlineMaps:DataSourceBase,IFormatConverter
     {
         private string _mapName;
+        private string _strTilesFormat;
         private string _baseUrl;
         private string[] _subDomains;
         private static string CONFIG_FILE_NAME;
@@ -39,12 +36,13 @@ namespace PBS.DataSource
         {            
             try
             {
-                CONFIG_FILE_NAME = AppDomain.CurrentDomain.BaseDirectory + "CustomOnlineMaps.xml";
+                CONFIG_FILE_NAME = AppDomain.CurrentDomain.BaseDirectory +@"\CustomOnlineMaps.xml";
                 _customOnlineMaps = new List<CustomOnlineMap>();
                 if (!File.Exists(CONFIG_FILE_NAME))
                 {
                     throw new FileNotFoundException(CONFIG_FILE_NAME + " does not exist!");
                 }
+
                 XDocument xDoc = XDocument.Load(CONFIG_FILE_NAME);
                 var maps = from map in xDoc.Descendants("onlinemapsources").Elements()
                            select new
@@ -53,6 +51,7 @@ namespace PBS.DataSource
                                Url = map.Element("url"),
                                Servers = map.Element("servers")
                            };
+
                 foreach (var map in maps)
                 {
                     _customOnlineMaps.Add(new CustomOnlineMap()
@@ -73,9 +72,11 @@ namespace PBS.DataSource
         /// when isForConvert==true, gettile() method will return null instead of returning an error image byte[]
         /// </summary>
         /// <param name="name"></param>
-        public DataSourceCustomOnlineMaps(string name)
+        /// <param name="strTilesFormat"></param>
+        public DataSourceCustomOnlineMaps(string name,string strTilesFormat="JPG")
         {
             _mapName = name;
+            _strTilesFormat = strTilesFormat;
             Initialize("N/A");
             if (ConfigManager.App_AllowFileCacheOfOnlineMaps)
             {
@@ -111,8 +112,20 @@ namespace PBS.DataSource
             ReadGoogleMapsTilingScheme(out tilingScheme);
             this.TilingScheme = TilingSchemePostProcess(tilingScheme);
 
-            if (_mapName.ToLower().Contains("image"))
+            //if (_mapName.ToLower().Contains("image"))
+            //this.TilingScheme.CacheTileFormat = ImageFormat.JPG;
+            //gisweis：修改瓦片格式
+            //有的GIS平台不支持JPG格式的WMTS服务，如如超图
+            if (_strTilesFormat.ToUpper().Contains("PNG"))
+            {
+                this.TilingScheme.CacheTileFormat = ImageFormat.PNG;
+            }
+            else
+            {
                 this.TilingScheme.CacheTileFormat = ImageFormat.JPG;
+            }
+
+            
         }
 
         public override byte[] GetTileBytes(int level, int row, int col)
@@ -188,7 +201,7 @@ namespace PBS.DataSource
         /// <param name="description">A description of the tiles as plain text., required by MBTiles.</param>
         /// <param name="attribution">An attribution string, which explains in English (and HTML) the sources of data and/or style for the map., required by MBTiles.</param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        public void ConvertToMBTiles(string outputPath, string name, string description, string attribution,bool doCompact)
+        public void ConvertToMbTiles(string outputPath, string name, string description, string attribution,bool doCompact)
         {
             throw new NotImplementedException();
         }
@@ -203,7 +216,7 @@ namespace PBS.DataSource
         /// <param name="levels">tiles in which levels to convert to mbtiles.</param>
         /// <param name="geometry">convert/download extent or polygon, sr=3857. If this is Envelope, download by rectangle, if this is polygon, download by polygon's shape.</param>
         /// <param name="doCompact">implementing the reducing redundant tile bytes part of MBTiles specification?</param>
-        public void ConvertToMBTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact)
+        public void ConvertToMbTiles(string outputPath, string name, string description, string attribution, int[] levels, Geometry geometry,bool doCompact)
         {
             try
             {

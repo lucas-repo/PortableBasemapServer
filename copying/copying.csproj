@@ -11,7 +11,8 @@
     <RootNamespace>copying</RootNamespace>
     <AssemblyName>copying</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -44,6 +45,7 @@
     <None Include="Commons.dll" />
     <None Include="CustomOnlineMaps.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="gdal18.dll" />
     <None Include="gdalbuildvrt.exe" />

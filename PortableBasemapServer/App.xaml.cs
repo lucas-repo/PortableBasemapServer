@@ -15,7 +15,9 @@ namespace PBS.APP
         //程序启动
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            //gisweis:解决UAC启动问题
             CheckAdministrator();
+
             //log4net初始化
             try
             {
