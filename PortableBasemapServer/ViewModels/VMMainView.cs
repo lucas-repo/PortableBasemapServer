@@ -19,7 +19,7 @@ using System.ServiceProcess;
 
 namespace PBS.APP.ViewModels
 {
-    public class VMMainView:INotifyPropertyChanged
+    public class VMMainView : INotifyPropertyChanged
     {
         private ConfigManager _configManager = ConfigManager.Instance;
         private string _currentLanguage;//avoid to use multibinding in xaml to determine current ui language
@@ -41,10 +41,10 @@ namespace PBS.APP.ViewModels
             {
                 _selectedPBSService = value;
                 if (value != null)
-                {                    
+                {
                     SelectedServiceChanged(_selectedPBSService);
                 }
-                
+
                 NotifyPropertyChanged(p => p.SelectedPBSService);
             }
         }
@@ -125,7 +125,7 @@ namespace PBS.APP.ViewModels
                 NotifyPropertyChanged(p => p.ValueVisualStyle);
                 SelectedVisualStyleChanged();
             }
-        }     
+        }
         private string _valueDataSourcePath;
         /// <summary>
         /// binding to textboxDataSourcePath's text
@@ -163,7 +163,7 @@ namespace PBS.APP.ViewModels
             set
             {
                 _valueServiceName = value;
-                NotifyPropertyChanged(p => p.ValueServiceName);                
+                NotifyPropertyChanged(p => p.ValueServiceName);
             }
         }
 
@@ -197,24 +197,30 @@ namespace PBS.APP.ViewModels
         public bool IsAllowMemoryCache
         {
             get { return _isAllowMemoryCache; }
-            set { _isAllowMemoryCache = value;
-            NotifyPropertyChanged(p => p.IsAllowMemoryCache);
+            set
+            {
+                _isAllowMemoryCache = value;
+                NotifyPropertyChanged(p => p.IsAllowMemoryCache);
             }
         }
         private bool _isDisableClientCache;
         public bool IsDisableClientCache
         {
             get { return _isDisableClientCache; }
-            set { _isDisableClientCache = value;
-            NotifyPropertyChanged(p => p.IsDisableClientCache);
+            set
+            {
+                _isDisableClientCache = value;
+                NotifyPropertyChanged(p => p.IsDisableClientCache);
             }
         }
         private bool _isDisplayNoDataTile;
         public bool IsDisplayNoDataTile
         {
             get { return _isDisplayNoDataTile; }
-            set { _isDisplayNoDataTile = value;
-            NotifyPropertyChanged(p => p.IsDisplayNoDataTile);
+            set
+            {
+                _isDisplayNoDataTile = value;
+                NotifyPropertyChanged(p => p.IsDisplayNoDataTile);
             }
         }
         private MTObservableCollection<string> _ipAddresses = new MTObservableCollection<string>();
@@ -258,7 +264,7 @@ namespace PBS.APP.ViewModels
             {
                 return _tilesFormat;
             }
-             set
+            set
             {
                 _ipAddresses = value;
                 NotifyPropertyChanged(p => p._tilesFormat);
@@ -424,8 +430,10 @@ namespace PBS.APP.ViewModels
         public bool IsDataSourcePathTBEnabled
         {
             get { return _isDataSourcePathTBEnabled; }
-            private set { _isDataSourcePathTBEnabled = value;
-            NotifyPropertyChanged(p => p.IsDataSourcePathTBEnabled);
+            private set
+            {
+                _isDataSourcePathTBEnabled = value;
+                NotifyPropertyChanged(p => p.IsDataSourcePathTBEnabled);
             }
         }
         private Visibility _isBrowseButtonVisible;
@@ -435,8 +443,10 @@ namespace PBS.APP.ViewModels
         public Visibility IsBrowseButtonVisible
         {
             get { return _isBrowseButtonVisible; }
-            private set { _isBrowseButtonVisible = value;
-            NotifyPropertyChanged(p => p.IsBrowseButtonVisible);
+            private set
+            {
+                _isBrowseButtonVisible = value;
+                NotifyPropertyChanged(p => p.IsBrowseButtonVisible);
             }
         }
         private bool _isBrowseButtonEnabled;
@@ -446,8 +456,10 @@ namespace PBS.APP.ViewModels
         public bool IsBrowseButtonEnabled
         {
             get { return _isBrowseButtonEnabled; }
-            private set { _isBrowseButtonEnabled = value;
-            NotifyPropertyChanged(p => p.IsBrowseButtonEnabled);
+            private set
+            {
+                _isBrowseButtonEnabled = value;
+                NotifyPropertyChanged(p => p.IsBrowseButtonEnabled);
             }
         }
         private bool _isServiceNameTBEnabled;
@@ -457,8 +469,10 @@ namespace PBS.APP.ViewModels
         public bool IsServiceNameTBEnabled
         {
             get { return _isServiceNameTBEnabled; }
-            private set { _isServiceNameTBEnabled = value;
-            NotifyPropertyChanged(p => p.IsServiceNameTBEnabled);
+            private set
+            {
+                _isServiceNameTBEnabled = value;
+                NotifyPropertyChanged(p => p.IsServiceNameTBEnabled);
             }
         }
         private Visibility _isAGSDMSParamsButtonVisible;
@@ -468,8 +482,10 @@ namespace PBS.APP.ViewModels
         public Visibility IsAGSDMSParamsButtonVisible
         {
             get { return _isAGSDMSParamsButtonVisible; }
-            private set { _isAGSDMSParamsButtonVisible = value;
-            NotifyPropertyChanged(p => p.IsAGSDMSParamsButtonVisible);
+            private set
+            {
+                _isAGSDMSParamsButtonVisible = value;
+                NotifyPropertyChanged(p => p.IsAGSDMSParamsButtonVisible);
             }
         }
         #endregion
@@ -536,7 +552,7 @@ namespace PBS.APP.ViewModels
                 }
             };
             //UI language
-            SelectCulture(AppUtility.ReadConfig("Language", "en-US"));            
+            SelectCulture(AppUtility.ReadConfig("Language", "en-US"));
             //bing api key
             ConfigManager.App_BingMapsAppKey = AppUtility.ReadConfig("BingApiKey", string.Empty);
             //show in system tray?
@@ -548,7 +564,7 @@ namespace PBS.APP.ViewModels
             if (!Directory.Exists(ConfigManager.App_FileCachePath))
                 Directory.CreateDirectory(ConfigManager.App_FileCachePath);
             //load last configuration if necessary
-            System.Threading.Tasks.Task.Factory.StartNew(delegate()
+            System.Threading.Tasks.Task.Factory.StartNew(delegate ()
             {
                 //find machine's ipv4 address first, starting service follow need this address.
                 System.Net.IPHostEntry IpEntry = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
@@ -646,7 +662,7 @@ namespace PBS.APP.ViewModels
                 Utility.Cmd("sc stop " + _processName, false, out str, 500);
                 Utility.Cmd("sc delete " + _processName, false, out str);
                 if (!IsRunAsWindowsService)
-                {    
+                {
                     if (str.Contains("成功") || str.Contains("SUCCESS"))
                     {
                         MessageBox.Show(_processName + " windows service deleted successfully!", "", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -662,7 +678,7 @@ namespace PBS.APP.ViewModels
                     Utility.Cmd("sc create " + _processName + @" binPath= """ + System.Reflection.Assembly.GetExecutingAssembly().Location + @" /runasservice"" start= auto type= own DisplayName= " + _processName, false, out str, 500);
                     if (str.Contains("成功") || str.Contains("SUCCESS"))
                     {
-                        MessageBox.Show(_processName + " windows service created successfully!\r\n\r\n"+Application.Current.FindResource("msgWindowsServiceCreated").ToString(), "", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(_processName + " windows service created successfully!\r\n\r\n" + Application.Current.FindResource("msgWindowsServiceCreated").ToString(), "", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
@@ -762,15 +778,15 @@ namespace PBS.APP.ViewModels
             //http://blogs.u2u.be/peter/post/2010/10/19/Invoking-commands-from-events-using-the-InvokeCommandAction-behavior.aspx
             string[] commandParams = parameters.ToString().Split(new char[] { '_' });
             //datasource format info for ArcGISDynamicMapService datasource
-            if (commandParams[0] == "textboxDataSourcePath"&&
-                (ValueDataSourceType==DataSourceTypePredefined.ArcGISDynamicMapService.ToString()||
-                ValueDataSourceType == DataSourceTypePredefined.ArcGISTiledMapService.ToString()||
+            if (commandParams[0] == "textboxDataSourcePath" &&
+                (ValueDataSourceType == DataSourceTypePredefined.ArcGISDynamicMapService.ToString() ||
+                ValueDataSourceType == DataSourceTypePredefined.ArcGISTiledMapService.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.ArcGISImageService.ToString()))
             {
                 if (commandParams[1].ToLower() == "got")//got focus
                 {
                     if (ValueDataSourcePath == Application.Current.FindResource("tbArcGISDynamicMapServiceDataSourceInfo").ToString())
-                        ValueDataSourcePath = "";                    
+                        ValueDataSourcePath = "";
                 }
                 //else if (commandParams[1].ToLower() == "lost")
                 //{
@@ -888,7 +904,7 @@ namespace PBS.APP.ViewModels
                             ValueDataSourcePath = openFileDialog1.FileName;
                         }
                     }
-                    break;                 
+                    break;
                 case DataSourceTypePredefined.ArcGISCache:
                     System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
                     if (folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -946,7 +962,7 @@ namespace PBS.APP.ViewModels
         private void ServiceButtonClicked(object parameters)
         {
             string param = parameters.ToString();
-            if (param=="START")
+            if (param == "START")
             {
                 //if datasourcetype is file, check file existence
                 if (ValueDataSourceType == DataSourceTypePredefined.MobileAtlasCreator.ToString() || ValueDataSourceType == DataSourceTypePredefined.MBTiles.ToString() || ValueDataSourceType == DataSourceTypePredefined.RasterImage.ToString() || ValueDataSourceType == DataSourceTypePredefined.ArcGISTilePackage.ToString())
@@ -985,7 +1001,7 @@ namespace PBS.APP.ViewModels
                         IsDisableClientCache,
                         IsDisplayNoDataTile,
                         (VisualStyle)Enum.Parse(typeof(VisualStyle), ValueVisualStyle, true),
-                        null, 
+                        null,
                         str);
                 }
                 if (result != string.Empty)
@@ -1020,7 +1036,7 @@ namespace PBS.APP.ViewModels
                         ValueDataSourceType != DataSourceTypePredefined.ArcGISTilePackage.ToString() &&
                         ValueDataSourceType != DataSourceTypePredefined.MBTiles.ToString() &&
                         ValueDataSourceType != DataSourceTypePredefined.MobileAtlasCreator.ToString() &&
-                        ValueDataSourceType != DataSourceTypePredefined.RasterImage.ToString()&&
+                        ValueDataSourceType != DataSourceTypePredefined.RasterImage.ToString() &&
                         ValueDataSourceType != DataSourceTypePredefined.OGCWMSService.ToString())
                     {
                         MessageBox.Show(Application.Current.FindResource("msgOnlineMapsWarning").ToString(), Application.Current.FindResource("msgWarning").ToString(), MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1032,13 +1048,13 @@ namespace PBS.APP.ViewModels
             }
             if (param == "DELETE")
             {
-                if (SelectedPBSService !=null)
+                if (SelectedPBSService != null)
                 {
                     PBSService service = SelectedPBSService;
                     if (MessageBox.Show(Application.Current.FindResource("msgDeleteServiceWarning").ToString() + "\r\n" + service.ServiceName + ":" + service.Port.ToString(), Application.Current.FindResource("msgWarning").ToString(), MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
                     {
                         ServiceManager.DeleteService(service.Port, service.ServiceName);
-                        if(PBSServices.Count>0)
+                        if (PBSServices.Count > 0)
                             SelectedPBSService = PBSServices[0];
                     }
                 }
@@ -1093,7 +1109,7 @@ namespace PBS.APP.ViewModels
             //tilingscheme stack panel's visibility & usinggoogletilingscheme checkbox check status
             if (ValueDataSourceType == DataSourceTypePredefined.RasterImage.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.ArcGISDynamicMapService.ToString() ||
-                ValueDataSourceType == DataSourceTypePredefined.ArcGISImageService.ToString()||
+                ValueDataSourceType == DataSourceTypePredefined.ArcGISImageService.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.OGCWMSService.ToString())
             {
                 IsTilingSchemePanelVisible = Visibility.Visible;
@@ -1136,15 +1152,15 @@ namespace PBS.APP.ViewModels
                 ValueDataSourceType == DataSourceTypePredefined.ArcGISDynamicMapService.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.ArcGISTiledMapService.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.ArcGISImageService.ToString() ||
-                ValueDataSourceType == DataSourceTypePredefined.RasterImage.ToString()||
+                ValueDataSourceType == DataSourceTypePredefined.RasterImage.ToString() ||
                 ValueDataSourceType == DataSourceTypePredefined.OGCWMSService.ToString())
             {
-                IsDataSourcePathTBEnabled = true;                
+                IsDataSourcePathTBEnabled = true;
                 IsServiceNameTBEnabled = true;
             }
             else
             {
-                
+
                 IsDataSourcePathTBEnabled = false;
                 ValueServiceName = ValueDataSourceType;
 
@@ -1195,7 +1211,7 @@ namespace PBS.APP.ViewModels
                 IsAGSDMSParamsButtonVisible = Visibility.Collapsed;
 
             ValueDataSourcePath = service.DataSource.Path;
-            ValueServicePort = service.Port.ToString();            
+            ValueServicePort = service.Port.ToString();
             IsAllowMemoryCache = service.AllowMemCache;
             IsDisableClientCache = service.DisableClientCache;
             IsDisplayNoDataTile = service.DisplayNoDataTile;
