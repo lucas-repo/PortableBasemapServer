@@ -593,6 +593,13 @@ namespace PBS.APP.ViewModels
                     if (str != string.Empty)
                         MessageBox.Show(Application.Current.FindResource("msgOpenPortError").ToString() + port + ".\r\n" + str, Application.Current.FindResource("msgWarning").ToString(), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
+                foreach (var service in ServiceManager.Services)
+                {
+                    if (!IPAddresses.Contains(service.Ip))
+                    {
+                        IPAddresses.Add(service.Ip);
+                    }
+                }
             });
             //checking run as windows service status
             IsRunAsWindowsService = Utility.IsWindowsServiceExisted(_processName) ? true : false;
@@ -740,7 +747,7 @@ namespace PBS.APP.ViewModels
             {
                 try
                 {
-                    OnlineToMBTiles convertWindow = new OnlineToMBTiles(ValueServicePort);
+                    OnlineToMBTiles convertWindow = new OnlineToMBTiles(ValueIPAddress, ValueServicePort);
                     convertWindow.Owner = Application.Current.MainWindow;
                     convertWindow.Show();
                 }
@@ -979,6 +986,7 @@ namespace PBS.APP.ViewModels
                 {
                     result = ServiceManager.CreateService(
                         ValueServiceName,
+                        ValueIPAddress,
                         int.Parse(ValueServicePort),
                         ValueDataSourceType,
                         ValueDataSourcePath,
@@ -994,6 +1002,7 @@ namespace PBS.APP.ViewModels
                     string str = ValueTilesFormat;
                     result = ServiceManager.CreateService(
                         ValueServiceName,
+                        ValueIPAddress,
                         int.Parse(ValueServicePort),
                         ValueDataSourceType,
                         ValueDataSourcePath,
@@ -1044,6 +1053,10 @@ namespace PBS.APP.ViewModels
 
                     StrURLArcGIS = service.UrlArcGIS;
                     StrURLWMTS = service.UrlWMTS;
+                }
+                if (!IPAddresses.Contains(ValueIPAddress))
+                {
+                    IPAddresses.Add(ValueIPAddress);
                 }
             }
             if (param == "DELETE")

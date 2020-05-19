@@ -800,7 +800,7 @@ Invalid version!
             }
             else
             {
-                string name, datasourcepath, tilingschemepath;
+                string name,ip, datasourcepath, tilingschemepath;
                 int port;
                 string strDataSourceType;
                 bool allowmemorycache, disableclientcache, displaynodatatile;
@@ -818,6 +818,7 @@ Invalid version!
                         return new MemoryStream(System.Text.Encoding.UTF8.GetBytes(result));
                     }
                     name = htParams["name"].ToString();
+                    ip = htParams["ip"].ToString();
                     port = int.Parse(htParams["port"].ToString());
                     strDataSourceType = htParams["dataSourceType"].ToString();
                     datasourcepath = htParams["dataSourcePath"].ToString();
@@ -838,7 +839,7 @@ Invalid version!
                 }
                 #endregion
                                                                                                 string str=string.Empty;
-                                str = ServiceManager.CreateService(name, port, strDataSourceType, datasourcepath, allowmemorycache, disableclientcache, displaynodatatile, visualstyle, tilingschemepath);
+                                str = ServiceManager.CreateService(name, ip, port, strDataSourceType, datasourcepath, allowmemorycache, disableclientcache, displaynodatatile, visualstyle, tilingschemepath);
                 if (str != string.Empty)
                     result = @"{
                     ""success"": false,

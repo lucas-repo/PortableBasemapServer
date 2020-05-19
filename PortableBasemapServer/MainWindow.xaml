@@ -107,7 +107,7 @@
                         <!--ip address-->
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{DynamicResource tbLocalIPAddress}" VerticalAlignment="Center" />
-                            <ComboBox x:Name="cmbboxIPAddress" Width="150" ItemsSource="{Binding IPAddresses,Mode=OneWay}"  Text="{Binding ValueIPAddress,Mode=TwoWay}" IsEditable="True"/>
+                            <ComboBox x:Name="cmbboxIPAddress" Width="150" ItemsSource="{Binding IPAddresses,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  Text="{Binding ValueIPAddress,Mode=TwoWay}" IsEditable="True"/>
                             <TextBlock Text="{DynamicResource tbTilesFormat}" VerticalAlignment="Center"/>
                             <ComboBox x:Name="cmbboxTilesFormat" Width="60" ItemsSource="{Binding TilesFormat,Mode=OneWay}"  SelectedItem="{Binding ValueTilesFormat,Mode=TwoWay}" />
 

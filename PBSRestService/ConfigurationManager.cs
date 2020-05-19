@@ -145,15 +145,25 @@ namespace PBS
                 SQLiteDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
+                    var serviceName = (string)reader["name"];
+                    var ip = (string)reader["ip"];
+                    var port = int.Parse(reader["port"].ToString());
+                    var type = reader["type"].ToString();
+                    var datasourcepath = (string)reader["datasourcepath"];
+                    var allowmemcache = (bool)reader["allowmemcache"];
+                    var disableclientcache = (bool)reader["disableclientcache"];
+                    var displaynodatatile = (bool)reader["displaynodatatile"];
+                    var visualstyle = (VisualStyle)Enum.Parse(typeof(VisualStyle), (string)reader["visualstyle"], true);
                     if ((bool)reader["using3857"])
                     {
-                        string s = ServiceManager.CreateService((string)reader["name"], int.Parse(reader["port"].ToString()), reader["type"].ToString(), (string)reader["datasourcepath"], (bool)reader["allowmemcache"], (bool)reader["disableclientcache"], (bool)reader["displaynodatatile"], (VisualStyle)Enum.Parse(typeof(VisualStyle), (string)reader["visualstyle"], true));
+                        string s = ServiceManager.CreateService(serviceName, ip, port, type, datasourcepath, allowmemcache, disableclientcache, displaynodatatile, visualstyle);
                         if (s != string.Empty)
                             result += s + "\r\n";
                     }
                     else
                     {
-                        string s = ServiceManager.CreateService((string)reader["name"], int.Parse(reader["port"].ToString()), reader["type"].ToString(), (string)reader["datasourcepath"], (bool)reader["allowmemcache"], (bool)reader["disableclientcache"], (bool)reader["displaynodatatile"], (VisualStyle)Enum.Parse(typeof(VisualStyle), (string)reader["visualstyle"], true), (string)reader["tilingschemepath"]);     
+                        var tilingschemepath = (string)reader["tilingschemepath"];
+                        string s = ServiceManager.CreateService(serviceName, ip, port, type, datasourcepath, allowmemcache, disableclientcache, displaynodatatile, visualstyle, tilingschemepath);
                         if (s != string.Empty)
                             result += s + "\r\n";
                     }
@@ -207,9 +217,10 @@ namespace PBS
                         foreach (PBSService service in ServiceManager.Services)
                         {
                             //save services
-                            cmd.CommandText = "INSERT INTO " + CONST_strTableNameServices + " VALUES (@configuration,@name,@port,@type,@tilingschemepath,@using3857,@datasourcepath,@allowmemcache,@disableclientcache,@displaynodatatile,@visualstyle)";
+                            cmd.CommandText = "INSERT INTO " + CONST_strTableNameServices + " VALUES (@configuration,@name,@ip,@port,@type,@tilingschemepath,@using3857,@datasourcepath,@allowmemcache,@disableclientcache,@displaynodatatile,@visualstyle)";
                             cmd.Parameters.AddWithValue("@configuration", name);
                             cmd.Parameters.AddWithValue("@name", service.ServiceName);
+                            cmd.Parameters.AddWithValue("@ip", service.Ip);
                             cmd.Parameters.AddWithValue("@port", service.Port);
                             cmd.Parameters.AddWithValue("@type", service.DataSource.Type.ToString());
                             cmd.Parameters.AddWithValue("@tilingschemepath", service.DataSource.TilingScheme.Path);
@@ -394,7 +405,7 @@ namespace PBS
                     cmd.CommandText = @"CREATE TABLE """ + CONST_strTableNameConfigurations + @""" (""name"" TEXT PRIMARY KEY  NOT NULL  UNIQUE , ""servicecount"" INTEGER NOT NULL , ""created"" DATETIME)";
                     cmd.ExecuteNonQuery();
                     //services table
-                    cmd.CommandText = @"CREATE TABLE """ + CONST_strTableNameServices + @""" (""configuration"" TEXT NOT NULL , ""name"" TEXT NOT NULL , ""port"" INTEGER NOT NULL , ""type"" TEXT NOT NULL , ""tilingschemepath"" TEXT, ""using3857"" BOOL, ""datasourcepath"" TEXT, ""allowmemcache"" BOOL,""disableclientcache"" BOOL, ""displaynodatatile"" BOOL, ""visualstyle"" TEXT)";
+                    cmd.CommandText = @"CREATE TABLE """ + CONST_strTableNameServices + @""" (""configuration"" TEXT NOT NULL , ""name"" TEXT NOT NULL ,""ip"" TEXT NOT NULL , ""port"" INTEGER NOT NULL , ""type"" TEXT NOT NULL , ""tilingschemepath"" TEXT, ""using3857"" BOOL, ""datasourcepath"" TEXT, ""allowmemcache"" BOOL,""disableclientcache"" BOOL, ""displaynodatatile"" BOOL, ""visualstyle"" TEXT)";
                     cmd.ExecuteNonQuery();
                     cmd.CommandText = @"CREATE INDEX services_index on "+CONST_strTableNameServices+@" (configuration,name)";
                     cmd.ExecuteNonQuery();

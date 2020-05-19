@@ -19,13 +19,13 @@ namespace PBS.APP
     /// </summary>
     public partial class OnlineToMBTiles : Window
     {
-        public OnlineToMBTiles(string port)
+        public OnlineToMBTiles(string ipAddress, string port)
         {
             InitializeComponent();
             VMConvertOnlineToMBTiles vm;
             try
             {
-                vm = new VMConvertOnlineToMBTiles(map1, int.Parse(port));
+                vm = new VMConvertOnlineToMBTiles(map1, ipAddress, int.Parse(port));
                 this.DataContext = vm;
             }
             catch (Exception e)

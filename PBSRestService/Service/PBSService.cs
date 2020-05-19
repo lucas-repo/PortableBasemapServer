@@ -22,6 +22,7 @@ namespace PBS.Service
     public class PBSService
     {
         public string ServiceName { get; set; }
+        public string Ip { get; set; }
         public int Port { get; set; }
         public DataSourceBase DataSource { get; set; }
         public bool AllowMemCache { get; set; }//is server memory cache allowable
@@ -49,12 +50,13 @@ namespace PBS.Service
         /// </summary>
         /// <param name="serviceName"></param>
         /// <param name="dataSourcePath"></param>
+        /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <param name="strType">DataSourceType enum + custom online maps</param>
         /// <param name="disableClientCache"></param>
         /// <param name="displayNodataTile"></param>
         /// <param name="tilingSchemePath">Set this parameter only when type is ArcGISDynamicMapService||RasterDataset and do not use Google Maps's tiling scheme</param>
-        public PBSService(string serviceName, string dataSourcePath, int port, string strType, bool allowmemcache, bool disableClientCache, bool displayNodataTile, VisualStyle style, string tilingSchemePath,string tileFormat = "JPG")
+        public PBSService(string serviceName, string dataSourcePath,string ip, int port, string strType, bool allowmemcache, bool disableClientCache, bool displayNodataTile, VisualStyle style, string tilingSchemePath,string tileFormat = "JPG")
         {
             ServiceName = serviceName;
             if (!DataSourceBase.IsOnlineMaps(strType))
@@ -121,17 +123,16 @@ namespace PBS.Service
                     IsOnlineMap=true
                 };
             }
-            
-            
+            Ip = ip;
             Port = port;
             AllowMemCache = allowmemcache;
             DisableClientCache = disableClientCache;
             DisplayNoDataTile = displayNodataTile;            
             Style = style;
             LogInfo = new Log();
-            if(string.IsNullOrEmpty(ServiceManager.IPAddress))
+            if(string.IsNullOrEmpty(Ip))
                 throw new Exception("IPAddress is null or empty when creating PBS service!");
-            UrlArcGIS = "http://" + ServiceManager.IPAddress + ":" + Port + "/FMS/rest/services/" + ServiceName + "/MapServer";
+            UrlArcGIS = "http://" + Ip + ":" + Port + "/FMS/rest/services/" + ServiceName + "/MapServer";
         }
 
         public void Dispose()

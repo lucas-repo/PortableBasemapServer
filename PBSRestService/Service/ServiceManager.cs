@@ -110,7 +110,7 @@ namespace PBS.Service
         /// <param name="tilingSchemePath">Set this parameter only when type is ArcGISDynamicMapService and do not use Google Maps's tiling scheme</param>
         /// <param name="tileFormat"></param>
         /// <returns>errors or warnings. string.empty if nothing wrong.</returns>
-        public static string CreateService(string name, int port, string strType, string dataSorucePath,bool allowMemoryCache, bool disableClientCache, bool displayNoDataTile,VisualStyle style,string tilingSchemePath=null,string tileFormat="JPG")
+        public static string CreateService(string name, string ipAddress, int port, string strType, string dataSorucePath,bool allowMemoryCache, bool disableClientCache, bool displayNoDataTile,VisualStyle style,string tilingSchemePath=null,string tileFormat="JPG")
         {
             PBSServiceProvider serviceProvider = null;
             string str;
@@ -130,7 +130,7 @@ namespace PBS.Service
             PBSService service;
             try
             {
-                service = new PBSService(name, dataSorucePath, port, strType,allowMemoryCache,disableClientCache,displayNoDataTile,style,tilingSchemePath, tileFormat);
+                service = new PBSService(name, dataSorucePath, ipAddress, port, strType,allowMemoryCache,disableClientCache,displayNoDataTile,style,tilingSchemePath, tileFormat);
             }
             catch (Exception e)//in case of reading conf.xml or conf.cdi file error|| reading a sqlite db error
             {

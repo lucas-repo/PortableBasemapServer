@@ -184,6 +184,7 @@ namespace PBS.APP.ViewModels
         private WebMercator _webMercator = new WebMercator();
         private GraphicsLayer _graphicsLayer;
         private PBSService _pbsService;
+        private string _ipAddress;
         private int _port;
         #endregion
 
@@ -191,13 +192,14 @@ namespace PBS.APP.ViewModels
         public ICommand CMDClickStartButton { get; private set; }
         public ICommand CMDClickProfileButton { get; private set; }
 
-        public VMConvertOnlineToMBTiles(Map esriMap,int port)
+        public VMConvertOnlineToMBTiles(Map esriMap,string ipAddress, int port)
         {
             //check internet connectivity
             if (!PBS.Util.Utility.IsConnectedToInternet())
             {
                 throw new Exception("No internet connectivity!");
             }
+            _ipAddress = ipAddress;
             _port = port;
             //check the availability of the port using for this map
             if (!ServiceManager.PortEntities.ContainsKey(_port))
@@ -476,7 +478,7 @@ namespace PBS.APP.ViewModels
                     ServiceManager.DeleteService(_port, _hiddenServiceName);
                 else
                     _hiddenServiceName = _hiddenServiceName + ServiceManager.PortEntities[_port].ServiceProvider.Services.Count(service => service.Key.Contains(_hiddenServiceName)).ToString();//INTERNALDOWNLOAD0,INTERNALDOWNLOAD1...
-                _pbsService = new PBSService(_hiddenServiceName, "", _port, SelectedDatasourceType, false, true, true, VisualStyle.None, null);
+                _pbsService = new PBSService(_hiddenServiceName, "",_ipAddress, _port, SelectedDatasourceType, false, true, true, VisualStyle.None, null);
                 ServiceManager.PortEntities[_port].ServiceProvider.Services.Add(_pbsService.ServiceName, _pbsService);
                 _map.Layers.RemoveAt(0);
                 ArcGISTiledMapServiceLayer l = new ArcGISTiledMapServiceLayer() { Url = _pbsService.UrlArcGIS };
