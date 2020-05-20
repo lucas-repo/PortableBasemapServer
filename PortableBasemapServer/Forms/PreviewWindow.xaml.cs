@@ -12,6 +12,7 @@ using PBS.DataSource;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace PBS.APP
 {
@@ -33,13 +34,13 @@ namespace PBS.APP
 
             _service = service;
             //for MAC and mbtiles and those whose wkid=102100 and which doesn't has initialextent
-            if ((service.DataSource.Type == DataSourceTypePredefined.MobileAtlasCreator.ToString()&&Math.Abs(service.DataSource.TilingScheme.InitialExtent.XMin + 20037508.3427892) < 0.1)  ||
-                (service.DataSource.Type == DataSourceTypePredefined.MBTiles.ToString()&&Math.Abs(service.DataSource.TilingScheme.InitialExtent.XMin + 20037508.3427892) < 0.1) ||
+            if ((service.DataSource.Type == DataSourceTypePredefined.MobileAtlasCreator.ToString() && Math.Abs(service.DataSource.TilingScheme.InitialExtent.XMin + 20037508.3427892) < 0.1) ||
+                (service.DataSource.Type == DataSourceTypePredefined.MBTiles.ToString() && Math.Abs(service.DataSource.TilingScheme.InitialExtent.XMin + 20037508.3427892) < 0.1) ||
                 (service.DataSource.Type == DataSourceTypePredefined.RasterImage.ToString() && (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 3857)) ||
                 (service.DataSource.Type == DataSourceTypePredefined.ArcGISDynamicMapService.ToString() && (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 3857)))
             {
                 ArcGISTiledMapServiceLayer streetLayer = new ArcGISTiledMapServiceLayer() { Url = "http://www.arcgisonline.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer" };
-                streetLayer.InitializationFailed += (s,a) =>
+                streetLayer.InitializationFailed += (s, a) =>
                     {
                         string innerMessage = (s as ArcGISTiledMapServiceLayer).InitializationFailure.InnerException == null ? string.Empty : (s as ArcGISTiledMapServiceLayer).InitializationFailure.InnerException.Message;
                         string message = "ArcGIS Online World Street Map" + "\r\n" + (s as ArcGISTiledMapServiceLayer).InitializationFailure.Message;
@@ -69,8 +70,9 @@ namespace PBS.APP
                 GridLeft.Children.Add(sp);
             }
             //add PBS Service layer
-            ArcGISTiledMapServiceLayer pbsLayer=new ArcGISTiledMapServiceLayer() { Url = service.UrlArcGIS,ID="PBSLayer" };
-            pbsLayer.InitializationFailed+=(s,a)=>{
+            ArcGISTiledMapServiceLayer pbsLayer = new ArcGISTiledMapServiceLayer() { Url = service.UrlArcGIS, ID = "PBSLayer" };
+            pbsLayer.InitializationFailed += (s, a) =>
+            {
                 MessageBox.Show("PBSLayer" + "\r\n" + (s as ArcGISTiledMapServiceLayer).InitializationFailure.Message + "\r\n" + (s as ArcGISTiledMapServiceLayer).InitializationFailure.InnerException.Message);
             };
             //pbsLayer.Initialized+=(s,a)=>{
@@ -88,7 +90,7 @@ namespace PBS.APP
             StringBuilder sbLODs = new StringBuilder();
             foreach (LODInfo lod in service.DataSource.TilingScheme.LODs)
             {
-                sbLODs.Append("Level:" + lod.LevelID +", Scale:" + lod.Scale + ", Resolution:" + lod.Resolution + "\r\n");
+                sbLODs.Append("Level:" + lod.LevelID + ", Scale:" + lod.Scale + ", Resolution:" + lod.Resolution + "\r\n");
             }
             string str = sbLODs.ToString();
             str = str.Remove(str.Length - 2);//remove last \r \n
@@ -112,7 +114,10 @@ namespace PBS.APP
                     }
                 }
                 double xmin, ymin, xmax, ymax;
-                CalculateTileBBox(e.Level, e.Row, e.Column, out xmin, out ymin, out xmax, out ymax);
+                if (!CalculateTileBBox(e.Level, e.Row, e.Column, out xmin, out ymin, out xmax, out ymax))
+                {
+                    return;
+                }
                 //polygon as bounding box
                 Polygon boundingLine = new Polygon();
                 ESRI.ArcGIS.Client.Geometry.PointCollection pc = new ESRI.ArcGIS.Client.Geometry.PointCollection();
@@ -125,7 +130,7 @@ namespace PBS.APP
                 SimpleFillSymbol sfs = new SimpleFillSymbol()
                 {
                     //BorderThickness = 2.0,
-                    BorderBrush = new SolidColorBrush(Color.FromArgb(200, 255, 255,255)),
+                    BorderBrush = new SolidColorBrush(Color.FromArgb(200, 255, 255, 255)),
                 };
                 //dynamic-red, filecache-yellow, memcached-green
                 if (e.GeneratedMethod == TileGeneratedSource.DynamicOutput)
@@ -196,44 +201,57 @@ namespace PBS.APP
         {
             try
             {
-                ArcGISTiledMapServiceLayer layer=map1.Layers["PBSLayer"] as ArcGISTiledMapServiceLayer;
-            //find current lod
-            int i;
-            for (i=0;i<layer.TileInfo.Lods.Length;i++)
-            {
-                if (Math.Abs(map1.Resolution -layer.TileInfo.Lods[i].Resolution) < 0.000001)
+                ArcGISTiledMapServiceLayer layer = map1.Layers["PBSLayer"] as ArcGISTiledMapServiceLayer;
+                //find current lod
+                int i;
+                for (i = 0; i < layer.TileInfo.Lods.Length; i++)
                 {
-                    break;
+                    if (Math.Abs(map1.Resolution - layer.TileInfo.Lods[i].Resolution) < 0.000001)
+                    {
+                        break;
+                    }
                 }
-            }
-            tbZoomLevel.Text = FindResource("tbLevel").ToString()+":" + _service.DataSource.TilingScheme.LODs[i].LevelID + " ";
-            tbScale.Text = FindResource("tbScale").ToString() + ":" + string.Format("{0:N0}", _service.DataSource.TilingScheme.LODs[i].Scale) + " ";
-            tbResolution.Text = FindResource("tbResolution").ToString() + ":" + _service.DataSource.TilingScheme.LODs[i].Resolution;
-            //if zoom level changed, then cleargraphics
-            if (Math.Abs(_oldResolution - _service.DataSource.TilingScheme.LODs[i].Resolution) > 0.0000001)
-            {
-                _gLayer.ClearGraphics();
-                _dictDrawedGrids.Clear();
-            }
-             _oldResolution = _service.DataSource.TilingScheme.LODs[i].Resolution;
+                tbZoomLevel.Text = FindResource("tbLevel").ToString() + ":" + _service.DataSource.TilingScheme.LODs[i].LevelID + " ";
+                tbScale.Text = FindResource("tbScale").ToString() + ":" + string.Format("{0:N0}", _service.DataSource.TilingScheme.LODs[i].Scale) + " ";
+                tbResolution.Text = FindResource("tbResolution").ToString() + ":" + _service.DataSource.TilingScheme.LODs[i].Resolution;
+                //if zoom level changed, then cleargraphics
+                if (Math.Abs(_oldResolution - _service.DataSource.TilingScheme.LODs[i].Resolution) > 0.0000001)
+                {
+                    _gLayer.ClearGraphics();
+                    _dictDrawedGrids.Clear();
+                }
+                _oldResolution = _service.DataSource.TilingScheme.LODs[i].Resolution;
             }
             catch (Exception)
             {
-               
-            }            
+
+            }
         }
 
-        private void CalculateTileBBox(int level, int row, int col, out double xmin, out double ymin, out double xmax, out double ymax)
+        private bool CalculateTileBBox(int level, int row, int col, out double xmin, out double ymin, out double xmax, out double ymax)
         {
             //calculate the bbox
-            double resolution = _service.DataSource.TilingScheme.LODs[level].Resolution;
-            PBS.Util.Point origin = _service.DataSource.TilingScheme.TileOrigin;
-            int tileRows = _service.DataSource.TilingScheme.TileRows;
-            int tileCols = _service.DataSource.TilingScheme.TileCols;
-            xmin = origin.X + resolution * tileCols * col;
-            ymin = origin.Y - resolution * tileRows * (row + 1);
-            xmax = origin.X + resolution * tileCols * (col + 1);
-            ymax = origin.Y - resolution * tileRows * row;
+            bool ret = false;
+            if (level >= 0 && level < _service.DataSource.TilingScheme.LODs.Length)
+            {
+                double resolution = _service.DataSource.TilingScheme.LODs[level].Resolution;
+                PBS.Util.Point origin = _service.DataSource.TilingScheme.TileOrigin;
+                int tileRows = _service.DataSource.TilingScheme.TileRows;
+                int tileCols = _service.DataSource.TilingScheme.TileCols;
+                xmin = origin.X + resolution * tileCols * col;
+                ymin = origin.Y - resolution * tileRows * (row + 1);
+                xmax = origin.X + resolution * tileCols * (col + 1);
+                ymax = origin.Y - resolution * tileRows * row;
+                ret = true;
+            }
+            else
+            {
+                xmin = double.NaN;
+                ymin = double.NaN;
+                xmax = double.NaN;
+                ymax = double.NaN;
+            }
+            return ret;
         }
 
         public Size MeasureTextWidth(string text, double fontSize, string typeFace)

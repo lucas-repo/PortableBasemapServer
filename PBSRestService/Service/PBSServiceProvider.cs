@@ -26,18 +26,19 @@ namespace PBS.Service
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class PBSServiceProvider : IPBSServiceProvider
     {
-        public Dictionary<string, PBSService> Services { get; set; }        public const string PBSName = "Portable Basemap Server";
+        public Dictionary<string, PBSService> Services { get; set; }
+        public const string PBSName = "Portable Basemap Server";
 
         public PBSServiceProvider()
         {
             Services = new Dictionary<string, PBSService>();
-                        PortEntity parentPortEntity;
-            int requestPort = Utility.GetRequestPortNumber();            
+            PortEntity parentPortEntity;
+            int requestPort = Utility.GetRequestPortNumber();
             if (ServiceManager.PortEntities.TryGetValue(requestPort, out parentPortEntity))
             {
                 Services = parentPortEntity.ServiceProvider.Services;
             }
-                                    if (requestPort != -1 && !ServiceManager.PortEntities.ContainsKey(requestPort))
+            if (requestPort != -1 && !ServiceManager.PortEntities.ContainsKey(requestPort))
                 throw new WebFaultException<string>("The request port does not exist in PBS. This can be caused by setting a url rewrite/revers proxy incorrectly.", HttpStatusCode.BadRequest);
         }
 
@@ -72,7 +73,7 @@ namespace PBS.Service
         {
             WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
-                        string str = @"<?xml version=""1.0"" ?> 
+            string str = @"<?xml version=""1.0"" ?> 
 <cross-domain-policy>
  <allow-access-from domain=""*""/>
  <site-control permitted-cross-domain-policies=""all""/>
@@ -84,7 +85,7 @@ namespace PBS.Service
 
         public Stream GenerateArcGISServerInfo(string f, string callback)
         {
-                        string str = @"{
+            string str = @"{
  ""currentVersion"": 10.11,
  ""fullVersion"": ""10.1.1"",
  ""soapUrl"": ""http://none"",
@@ -108,14 +109,14 @@ namespace PBS.Service
 
         public Stream GenerateArcGISServerEndpointInfo(string f, string callback)
         {
-                        string folders = string.Empty;
+            string folders = string.Empty;
             string services = string.Empty;
             foreach (KeyValuePair<string, PBSService> kvp in Services)
             {
-                                services += "{\"name\":\"" + kvp.Key + "\",\"type\":\"MapServer\"},\r\n";
+                services += "{\"name\":\"" + kvp.Key + "\",\"type\":\"MapServer\"},\r\n";
             }
             if (!string.IsNullOrEmpty(services))
-                services = services.Remove(services.Length - 3);            string str = @"{""currentVersion"" : 10.01, 
+                services = services.Remove(services.Length - 3); string str = @"{""currentVersion"" : 10.01, 
   ""folders"" : [
     " + folders + @"
   ], 
@@ -155,13 +156,14 @@ namespace PBS.Service
                     {
                         str = Services[serviceName].DataSource.TilingScheme.RestResponseArcGISPJson;
                     }
-                    else if (f == "jsapi")                    {
+                    else if (f == "jsapi")
+                    {
                         WebOperationContext.Current.OutgoingResponse.ContentType = "text/html; charset=utf-8";
                         #region jsapi
                         str = @"<!DOCTYPE html PUBLIC ""-<html>
 <head>
 <meta http-equiv=""X-UA-Compatible"" content=""IE=7"" />
-  <title>ArcGIS JavaScript API: "+Services[serviceName].ServiceName+@"</title>
+  <title>ArcGIS JavaScript API: " + Services[serviceName].ServiceName + @"</title>
   <link href='http://services.arcgisonline.com/ArcGIS/rest/ESRI.ArcGIS.Rest.css' rel='stylesheet' type='text/css'>
 <style type=""text/css"">
   @import ""http://serverapi.arcgisonline.com/jsapi/arcgis/2.8/js/dojo/dijit/themes/tundra/tundra.css"";
@@ -211,7 +213,7 @@ var resizeTimer;
 <tbody>
 <tr valign=""top"">
 <td id=""breadcrumbs"">
-ArcGIS JavaScript API: "+Services[serviceName].ServiceName+@"
+ArcGIS JavaScript API: " + Services[serviceName].ServiceName + @"
 </td>
 <td align=""right"" id=""help"">
 Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascript/arcgis"">ArcGIS JavaScript API</a>
@@ -232,7 +234,7 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                     {
                         str = "only support json/pjson/jsapi format! for instance: http://hostname:port/FMS/rest/servicename/MapServer?f=json[pjson||jsapi]";
                     }
-                                                            if (callBack != null)
+                    if (callBack != null)
                     {
                         str = callBack + "(" + str + ");";
                     }
@@ -245,7 +247,7 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
             }
             return null;
         }
-                public Stream GenerateArcGISServiceInfo(string serviceName, string operation, string f, string callBack)
+        public Stream GenerateArcGISServiceInfo(string serviceName, string operation, string f, string callBack)
         {
             if (Services != null)
             {
@@ -254,7 +256,7 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                 WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
                 if (Services.ContainsKey(serviceName))
                 {
-                                                            str = @"{""error"":{""code"":400,""message"":""Unable to complete  operation."",""details"":[""" + operation + @" operation not supported on this service""]}}";
+                    str = @"{""error"":{""code"":400,""message"":""Unable to complete  operation."",""details"":[""" + operation + @" operation not supported on this service""]}}";
                     if (callBack != null)
                     {
                         str = callBack + "(" + str + ");";
@@ -293,15 +295,16 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                 }
                 else
                 {
-                                        CheckEtag(level, row, col);
+                    CheckEtag(level, row, col);
                     SetEtag(level, row, col);
                 }
-                                                                                                                byte[] bytes = Task.Factory.StartNew<byte[]>(delegate()
-                {
-                    return GetTileStream(serviceName, level, row, col);
-                }).Result;
+                byte[] bytes = Task.Factory.StartNew<byte[]>(delegate ()
+{
+return GetTileStream(serviceName, level, row, col);
+}).Result;
 
-                if (Services.ContainsKey(serviceName))                {
+                if (Services.ContainsKey(serviceName))
+                {
                     if (bytes != null)
                     {
                         MemoryStream ms = new MemoryStream(bytes);
@@ -309,11 +312,11 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                     }
                     else if (Services[serviceName].DisplayNoDataTile)
                     {
-                                                                        return this.GetType().Assembly.GetManifestResourceStream("PBS.Assets.missing" + Services[serviceName].DataSource.TilingScheme.TileCols + "." + suffix);
+                        return this.GetType().Assembly.GetManifestResourceStream("PBS.Assets.missing" + Services[serviceName].DataSource.TilingScheme.TileCols + "." + suffix);
                     }
                 }
             }
-                        WebOperationContext.Current.OutgoingResponse.SetStatusAsNotFound("tile not exists");
+            WebOperationContext.Current.OutgoingResponse.SetStatusAsNotFound("tile not exists");
             return null;
         }
 
@@ -326,12 +329,12 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                 byte[] bytes = null;
                 TileLoadEventArgs tileLEA = new TileLoadEventArgs()
                 {
-                    Level=int.Parse(level),
-                    Row=int.Parse(row),
-                    Column=int.Parse(col)
+                    Level = int.Parse(level),
+                    Row = int.Parse(row),
+                    Column = int.Parse(col)
                 };
                 string key = Services[serviceName].Port + serviceName + level + row + col + "_" + Services[serviceName].MemcachedValidKey;
-                                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache && ServiceManager.Memcache.MC.KeyExists(key))
+                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache && ServiceManager.Memcache.MC.KeyExists(key))
                 {
                     bytes = (byte[])ServiceManager.Memcache.MC.Get(key);
                     if (bytes != null)
@@ -344,8 +347,8 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                         tileLEA.GeneratedMethod = TileGeneratedSource.FromMemcached;
                     }
                 }
-                                if (bytes == null && (Services[serviceName].DataSource.IsOnlineMap ||
-                    Services[serviceName].DataSource is DataSourceRasterImage))
+                if (bytes == null && (Services[serviceName].DataSource.IsOnlineMap ||
+    Services[serviceName].DataSource is DataSourceRasterImage))
                 {
                     bytes = Services[serviceName].DataSource.GetTileBytesFromLocalCache(int.Parse(level), int.Parse(row), int.Parse(col));
                     if (bytes != null)
@@ -358,21 +361,21 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
                         tileLEA.GeneratedMethod = TileGeneratedSource.FromFileCache;
                     }
                 }
-                                if (bytes == null)
+                if (bytes == null)
                 {
                     bytes = Services[serviceName].DataSource.GetTileBytes(int.Parse(level), int.Parse(row), int.Parse(col));
                     Services[serviceName].LogInfo.OutputTileCountDynamic++;
                     Services[serviceName].LogInfo.OutputTileTotalTime += sw.Elapsed.TotalMilliseconds;
                     tileLEA.GeneratedMethod = TileGeneratedSource.DynamicOutput;
                 }
-                                if (Services[serviceName].Style != VisualStyle.None)
+                if (Services[serviceName].Style != VisualStyle.None)
                     bytes = PBS.Util.Utility.MakeShaderEffect(bytes, Services[serviceName].Style);
-                                if (Services[serviceName].DataSource.TileLoaded != null)
+                if (Services[serviceName].DataSource.TileLoaded != null)
                 {
                     tileLEA.TileBytes = bytes;
                     Services[serviceName].DataSource.TileLoaded(Services[serviceName].DataSource, tileLEA);
                 }
-                                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache)
+                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache)
                     ServiceManager.Memcache.MC.Set(key, bytes);
                 sw.Stop();
                 return bytes;
@@ -382,10 +385,10 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
 
         public Stream GenerateWMTSTileRESTful(string serviceName, string version, string layer, string style, string tilematrixset, string tilematrix, string row, string col, string format)
         {
-            if(Services==null||!Services.ContainsKey(serviceName))
+            if (Services == null || !Services.ContainsKey(serviceName))
                 return null;
             string suffix = Services[serviceName].DataSource.TilingScheme.CacheTileFormat.ToString().ToUpper().Contains("PNG") ? "png" : "jpg";
-            if ( !string.Equals(version, "1.0.0") || !string.Equals(serviceName, layer)||!string.Equals(suffix,format))
+            if (!string.Equals(version, "1.0.0") || !string.Equals(serviceName, layer) || !string.Equals(suffix, format))
                 return null;
             return GenerateArcGISTile(serviceName, tilematrix, row, col);
         }
@@ -395,7 +398,7 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
             if (Services == null || !Services.ContainsKey(serviceName))
                 return null;
             string suffix = Services[serviceName].DataSource.TilingScheme.CacheTileFormat.ToString().ToUpper().Contains("PNG") ? "png" : "jpg";
-            if (!string.Equals(version, "1.0.0") || !string.Equals(serviceName, layer) || !string.Equals(suffix, format.Split(new char[]{'/'})[1]))
+            if (!string.Equals(version, "1.0.0") || !string.Equals(serviceName, layer) || !string.Equals(suffix, format.Split(new char[] { '/' })[1]))
                 return null;
             return GenerateArcGISTile(serviceName, tilematrix, row, col);
         }
@@ -404,8 +407,8 @@ Built using the  <a href=""http://resources.esri.com/arcgisserver/apis/javascrip
         {
             if (Services == null)
                 return null;
-            if(!Services.ContainsKey(serviceName))
-                throw new WebFaultException<string>(string.Format("The '{0}' service does not exist!",serviceName), HttpStatusCode.BadRequest);
+            if (!Services.ContainsKey(serviceName))
+                throw new WebFaultException<string>(string.Format("The '{0}' service does not exist!", serviceName), HttpStatusCode.BadRequest);
             WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
             string result;
@@ -422,27 +425,29 @@ Invalid version!
             else
             {
                 string tileMatrixSetName = "default028mm";
-                string tileFormat=Services[serviceName].DataSource.TilingScheme.CacheTileFormat.ToString().ToLower().Contains("png")?"png":"jpg";
-                PBSService service=Services[serviceName];
-                                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache && ServiceManager.Memcache.MC.KeyExists(key))
+                string tileFormat = Services[serviceName].DataSource.TilingScheme.CacheTileFormat.ToString().ToLower().Contains("png") ? "png" : "jpg";
+                PBSService service = Services[serviceName];
+                if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache && ServiceManager.Memcache.MC.KeyExists(key))
                     return new MemoryStream((byte[])ServiceManager.Memcache.MC.Get(key));
-                                        double INCHES_PER_METER = 39.37;
-		double PIXEL_SIZE = 0.00028; 		double DPI_WMTS = 1.0/INCHES_PER_METER/PIXEL_SIZE;         Envelope wgs84boundingbox = null;
-                if (Math.Abs(service.DataSource.TilingScheme.TileOrigin.X) < 600)        {
-            wgs84boundingbox = service.DataSource.TilingScheme.FullExtent;
-        }
-        else if (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 102113 || service.DataSource.TilingScheme.WKID == 3857)        {
-            Point geoLowerLeft=Utility.WebMercatorToGeographic(service.DataSource.TilingScheme.FullExtent.LowerLeft);
-            Point geoUpperRight=Utility.WebMercatorToGeographic(service.DataSource.TilingScheme.FullExtent.UpperRight);
+                double INCHES_PER_METER = 39.37;
+                double PIXEL_SIZE = 0.00028; double DPI_WMTS = 1.0 / INCHES_PER_METER / PIXEL_SIZE; Envelope wgs84boundingbox = null;
+                if (Math.Abs(service.DataSource.TilingScheme.TileOrigin.X) < 600)
+                {
+                    wgs84boundingbox = service.DataSource.TilingScheme.FullExtent;
+                }
+                else if (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 102113 || service.DataSource.TilingScheme.WKID == 3857)
+                {
+                    Point geoLowerLeft = Utility.WebMercatorToGeographic(service.DataSource.TilingScheme.FullExtent.LowerLeft);
+                    Point geoUpperRight = Utility.WebMercatorToGeographic(service.DataSource.TilingScheme.FullExtent.UpperRight);
 
-            wgs84boundingbox = new Envelope(geoLowerLeft.X, geoLowerLeft.Y, geoUpperRight.X, geoUpperRight.Y);
-        }
-        bool isGoogleMapsCompatible = (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 102113 || service.DataSource.TilingScheme.WKID == 3857) && service.DataSource.TilingScheme.TileCols == 256 && service.DataSource.TilingScheme.TileRows == 256 && service.DataSource.TilingScheme.DPI == 96;
+                    wgs84boundingbox = new Envelope(geoLowerLeft.X, geoLowerLeft.Y, geoUpperRight.X, geoUpperRight.Y);
+                }
+                bool isGoogleMapsCompatible = (service.DataSource.TilingScheme.WKID == 102100 || service.DataSource.TilingScheme.WKID == 102113 || service.DataSource.TilingScheme.WKID == 3857) && service.DataSource.TilingScheme.TileCols == 256 && service.DataSource.TilingScheme.TileRows == 256 && service.DataSource.TilingScheme.DPI == 96;
                 XNamespace def = "http://www.opengis.net/wmts/1.0";
                 XNamespace ows = "http://www.opengis.net/ows/1.1";
-                XNamespace xlink="http://www.w3.org/1999/xlink";
-                XNamespace xsi="http://www.w3.org/2001/XMLSchema-instance";
-                XNamespace gml="http://www.opengis.net/gml";
+                XNamespace xlink = "http://www.w3.org/1999/xlink";
+                XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
+                XNamespace gml = "http://www.opengis.net/gml";
                 XNamespace schemaLocation = "http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd";
                 XElement root = new XElement(def + "Capabilities",
                         new XAttribute("xmlns", def),
@@ -453,28 +458,28 @@ Invalid version!
                         new XAttribute(xsi + "schemaLocation", schemaLocation),
                         new XAttribute("version", wmtsVersion),
                         new XComment(" Service Identification "),
-                        new XElement(ows + "ServiceIdentification",                            
+                        new XElement(ows + "ServiceIdentification",
                             new XElement(ows + "Title", serviceName),
                             new XElement(ows + "ServiceType", "OGC WMTS"),
                             new XElement(ows + "ServiceTypeVersion", wmtsVersion)),
-                        new XElement(ows+"ServiceProvider",
-                            new XElement(ows+"ProviderName",PBSName),
-                            new XElement(ows+"ProviderSite",
-                                new XAttribute(xlink+"href","https://geopbs.codeplex.com/")),
-                            new XElement(ows+"ServiceContact",
-                                new XElement(ows+"IndividualName","diligentpig"))),
+                        new XElement(ows + "ServiceProvider",
+                            new XElement(ows + "ProviderName", PBSName),
+                            new XElement(ows + "ProviderSite",
+                                new XAttribute(xlink + "href", "https://geopbs.codeplex.com/")),
+                            new XElement(ows + "ServiceContact",
+                                new XElement(ows + "IndividualName", "diligentpig"))),
                         new XComment(" Operations Metadata "),
-                        new XElement(ows+"OperationsMetadata",
-                            new XElement(ows+"Operation",
-                                new XAttribute("name","GetCapabilities"),
-                                new XElement(ows+"DCP",
-                                    new XElement(ows+"HTTP",
-                                        new XElement(ows+"Get",
+                        new XElement(ows + "OperationsMetadata",
+                            new XElement(ows + "Operation",
+                                new XAttribute("name", "GetCapabilities"),
+                                new XElement(ows + "DCP",
+                                    new XElement(ows + "HTTP",
+                                        new XElement(ows + "Get",
                                             new XAttribute(xlink + "href", string.Format("{0}/WMTS/{1}/WMTSCapabilities.xml", service.UrlArcGIS, wmtsVersion)),
-                                            new XElement(ows+"Constraint",
-                                                new XAttribute("name","GetEncoding"),
-                                                new XElement(ows+"AllowedValues",
-                                                    new XElement(ows+"Value","RESTful")))),
+                                            new XElement(ows + "Constraint",
+                                                new XAttribute("name", "GetEncoding"),
+                                                new XElement(ows + "AllowedValues",
+                                                    new XElement(ows + "Value", "RESTful")))),
                                         new XElement(ows + "Get",
                                             new XAttribute(xlink + "href", string.Format("{0}/WMTS?", service.UrlArcGIS)),
                                             new XElement(ows + "Constraint",
@@ -482,16 +487,16 @@ Invalid version!
                                                 new XElement(ows + "AllowedValues",
                                                     new XElement(ows + "Value", "KVP"))))
                                                     ))),
-                            new XElement(ows+"Operation",
-                                new XAttribute("name","GetTile"),
-                                new XElement(ows+"DCP",
-                                    new XElement(ows+"HTTP",
-                                        new XElement(ows+"Get",
+                            new XElement(ows + "Operation",
+                                new XAttribute("name", "GetTile"),
+                                new XElement(ows + "DCP",
+                                    new XElement(ows + "HTTP",
+                                        new XElement(ows + "Get",
                                             new XAttribute(xlink + "href", string.Format("{0}/WMTS/tile/{1}/", service.UrlArcGIS, wmtsVersion)),
-                                            new XElement(ows+"Constraint",
-                                                new XAttribute("name","GetEncoding"),
-                                                new XElement(ows+"AllowedValues",
-                                                    new XElement(ows+"Value","RESTful")))),
+                                            new XElement(ows + "Constraint",
+                                                new XAttribute("name", "GetEncoding"),
+                                                new XElement(ows + "AllowedValues",
+                                                    new XElement(ows + "Value", "RESTful")))),
                                        new XElement(ows + "Get",
                                             new XAttribute(xlink + "href", string.Format("{0}/WMTS?", service.UrlArcGIS)),
                                             new XElement(ows + "Constraint",
@@ -499,55 +504,55 @@ Invalid version!
                                                 new XElement(ows + "AllowedValues",
                                                     new XElement(ows + "Value", "KVP"))))
                                                     )))),
-                        new XElement(def+"Contents",
+                        new XElement(def + "Contents",
                             new XComment("Layer"),
-                            new XElement(def+"Layer",
-                                new XElement(ows+"Title",serviceName),
-                                new XElement(ows+"Identifier",serviceName),
+                            new XElement(def + "Layer",
+                                new XElement(ows + "Title", serviceName),
+                                new XElement(ows + "Identifier", serviceName),
                                 new XElement(ows + "BoundingBox",
-                                    new XAttribute("crs",string.Format("urn:ogc:def:crs:EPSG::{0}",service.DataSource.TilingScheme.WKID)),
+                                    new XAttribute("crs", string.Format("urn:ogc:def:crs:EPSG::{0}", service.DataSource.TilingScheme.WKID)),
                                     new XElement(ows + "LowerCorner", service.DataSource.TilingScheme.FullExtent.LowerLeft.X + " " + service.DataSource.TilingScheme.FullExtent.LowerLeft.Y),
                                     new XElement(ows + "UpperCorner", service.DataSource.TilingScheme.FullExtent.UpperRight.X + " " + service.DataSource.TilingScheme.FullExtent.UpperRight.Y)),
-                                                                wgs84boundingbox!=null ?
+                                                                wgs84boundingbox != null ?
                                 new XElement(ows + "WGS84BoundingBox",
                                     new XAttribute("crs", "urn:ogc:def:crs:OGC:2:84"),
                                     new XElement(ows + "LowerCorner", wgs84boundingbox.LowerLeft.X + " " + wgs84boundingbox.LowerLeft.Y),
                                     new XElement(ows + "UpperCorner", wgs84boundingbox.UpperRight.X + " " + wgs84boundingbox.UpperRight.Y)) : null,
-                                new XElement(def+"Style",
-                                    new XAttribute("isDefault","true"),
-                                    new XElement(ows+"Title","Default Style"),
-                                    new XElement(ows+"Identifier","default")),
-                                new XElement(def+"Format","image/"+tileFormat),
-                                new XElement(def+"TileMatrixSetLink",
-                                    new XElement(def+"TileMatrixSet",tileMatrixSetName)),
+                                new XElement(def + "Style",
+                                    new XAttribute("isDefault", "true"),
+                                    new XElement(ows + "Title", "Default Style"),
+                                    new XElement(ows + "Identifier", "default")),
+                                new XElement(def + "Format", "image/" + tileFormat),
+                                new XElement(def + "TileMatrixSetLink",
+                                    new XElement(def + "TileMatrixSet", tileMatrixSetName)),
                                 new XElement(def + "TileMatrixSetLink",
                                     new XElement(def + "TileMatrixSet", "nativeTileMatrixSet")),
-                                                                isGoogleMapsCompatible?
+                                                                isGoogleMapsCompatible ?
                                 new XElement(def + "TileMatrixSetLink",
                                     new XElement(def + "TileMatrixSet", "GoogleMapsCompatible")) : null,
-                                new XElement(def+"ResourceURL",
-                                    new XAttribute("format","image/"+tileFormat),
-                                    new XAttribute("resourceType","tile"),
+                                new XElement(def + "ResourceURL",
+                                    new XAttribute("format", "image/" + tileFormat),
+                                    new XAttribute("resourceType", "tile"),
                                     new XAttribute("template", string.Format("{0}/WMTS/tile/{1}/{2}/{{Style}}/{{TileMatrixSet}}/{{TileMatrix}}/{{TileRow}}/{{TileCol}}.{3}", service.UrlArcGIS, wmtsVersion, serviceName, tileFormat)))),
                             new XComment("TileMatrixSet"),
-                                                        new XElement(def+"TileMatrixSet",
+                                                        new XElement(def + "TileMatrixSet",
                                 new XElement(ows + "Title", "Default TileMatrix using 0.28mm"),
                                 new XElement(ows + "Abstract", "The tile matrix set that has scale values calculated based on the dpi defined by OGC specification (dpi assumes 0.28mm as the physical distance of a pixel)."),
-                                new XElement(ows+"Identifier",tileMatrixSetName),
-                                                    new XElement(ows+"SupportedCRS",string.Format("urn:ogc:def:crs:EPSG::{0}",service.DataSource.TilingScheme.WKID)),
+                                new XElement(ows + "Identifier", tileMatrixSetName),
+                                                    new XElement(ows + "SupportedCRS", string.Format("urn:ogc:def:crs:EPSG::{0}", service.DataSource.TilingScheme.WKID)),
                                 from lod in service.DataSource.TilingScheme.LODs
                                 let coords = getBoundaryTileCoords(service.DataSource.TilingScheme, lod)
-                                select new XElement(def+"TileMatrix",
-                                    new XElement(ows+"Identifier",lod.LevelID),
+                                select new XElement(def + "TileMatrix",
+                                    new XElement(ows + "Identifier", lod.LevelID),
                                                                                                                                                 new XElement(def + "ScaleDenominator", (lod.Scale * 25.4) / (0.28 * service.DataSource.TilingScheme.DPI)),
                                                                         new XElement(def + "TopLeftCorner", UseLatLon(service.DataSource.TilingScheme.WKID) ? service.DataSource.TilingScheme.TileOrigin.Y + " " + service.DataSource.TilingScheme.TileOrigin.X : service.DataSource.TilingScheme.TileOrigin.X + " " + service.DataSource.TilingScheme.TileOrigin.Y),
                                     new XElement(def + "TileWidth", service.DataSource.TilingScheme.TileCols),
                                     new XElement(def + "TileHeight", service.DataSource.TilingScheme.TileRows),
-                                                                        new XElement(def + "MatrixWidth", coords[3]- coords[1]+ 1),
+                                                                        new XElement(def + "MatrixWidth", coords[3] - coords[1] + 1),
                                     new XElement(def + "MatrixHeight", coords[2] - coords[0] + 1))),
                                                         new XElement(def + "TileMatrixSet",
                                 new XElement(ows + "Title", "Native TiledMapService TileMatrixSet"),
-                                new XElement(ows + "Abstract", string.Format("the tile matrix set that has scale values calculated based on the dpi defined by ArcGIS Server tiled map service. The current tile dpi is {0}",service.DataSource.TilingScheme.DPI)),
+                                new XElement(ows + "Abstract", string.Format("the tile matrix set that has scale values calculated based on the dpi defined by ArcGIS Server tiled map service. The current tile dpi is {0}", service.DataSource.TilingScheme.DPI)),
                                 new XElement(ows + "Identifier", "nativeTileMatrixSet"),
                                 new XElement(ows + "SupportedCRS", string.Format("urn:ogc:def:crs:EPSG::{0}", service.DataSource.TilingScheme.WKID)),
                                 from lod in service.DataSource.TilingScheme.LODs
@@ -560,30 +565,30 @@ Invalid version!
                                     new XElement(def + "TileHeight", service.DataSource.TilingScheme.TileRows),
                                     new XElement(def + "MatrixWidth", coords[3] - coords[1] + 1),
                                     new XElement(def + "MatrixHeight", coords[2] - coords[0] + 1))),
-                                                        isGoogleMapsCompatible?
+                                                        isGoogleMapsCompatible ?
                             new XElement(def + "TileMatrixSet",
                                 new XElement(ows + "Title", "GoogleMapsCompatible"),
                                 new XElement(ows + "Abstract", "the wellknown 'GoogleMapsCompatible' tile matrix set defined by OGC WMTS specification"),
                                 new XElement(ows + "Identifier", "GoogleMapsCompatible"),
                                 new XElement(ows + "SupportedCRS", "urn:ogc:def:crs:EPSG:6.18:3:3857"),
                                 new XElement(def + "WellKnownScaleSet", "urn:ogc:def:wkss:OGC:1.0:GoogleMapsCompatible"),
-                                from level in new int[] {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18}
+                                from level in new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }
                                 select new XElement(def + "TileMatrix",
                                     new XElement(ows + "Identifier", level),
-                                    new XElement(def + "ScaleDenominator", 559082264.0287178/Math.Pow(2,level)),
+                                    new XElement(def + "ScaleDenominator", 559082264.0287178 / Math.Pow(2, level)),
                                     new XElement(def + "TopLeftCorner", "-20037508.34278925 20037508.34278925"),
                                     new XElement(def + "TileWidth", "256"),
-                                    new XElement(def + "TileHeight","256"),
-                                    new XElement(def + "MatrixWidth", Math.Pow(2,level)),
+                                    new XElement(def + "TileHeight", "256"),
+                                    new XElement(def + "MatrixWidth", Math.Pow(2, level)),
                                     new XElement(def + "MatrixHeight", Math.Pow(2, level)))) : null
                             ),
-                        new XElement(def+"ServiceMetadataURL",
-                            new XAttribute(xlink + "href",string.Format("{0}/WMTS/{1}/WMTSCapabilities.xml",service.UrlArcGIS,version)))                                
-                        );                
+                        new XElement(def + "ServiceMetadataURL",
+                            new XAttribute(xlink + "href", string.Format("{0}/WMTS/{1}/WMTSCapabilities.xml", service.UrlArcGIS, version)))
+                        );
                 result = root.ToString();
-                            }            
+            }
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(result);
-                        if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache)
+            if (ServiceManager.Memcache != null && ServiceManager.Memcache.IsActived && Services[serviceName].AllowMemCache)
                 ServiceManager.Memcache.MC.Set(key, bytes);
             return new MemoryStream(bytes);
         }
@@ -592,8 +597,8 @@ Invalid version!
         {
             if (Services.ContainsKey(serviceName))
             {
-                                        WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Redirect;
-                    WebOperationContext.Current.OutgoingResponse.Location = Services[serviceName].UrlWMTS + "/1.0.0/WMTSCapabilities.xml";                    
+                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Redirect;
+                WebOperationContext.Current.OutgoingResponse.Location = Services[serviceName].UrlWMTS + "/1.0.0/WMTSCapabilities.xml";
             }
             return null;
         }
@@ -604,23 +609,23 @@ Invalid version!
         }
 
         #region wmts private method
-                private static readonly int[,] _latLongCrsRanges = new[,]
-		                                                   	{
-		                                                   		{4001, 4999},
-		                                                   		{2044, 2045}, {2081, 2083}, {2085, 2086}, {2093, 2093},
-		                                                   		{2096, 2098}, {2105, 2132}, {2169, 2170}, {2176, 2180},
-		                                                   		{2193, 2193}, {2200, 2200}, {2206, 2212}, {2319, 2319},
-		                                                   		{2320, 2462}, {2523, 2549}, {2551, 2735}, {2738, 2758},
-		                                                   		{2935, 2941}, {2953, 2953}, {3006, 3030}, {3034, 3035},
-		                                                   		{3058, 3059}, {3068, 3068}, {3114, 3118}, {3126, 3138},
-		                                                   		{3300, 3301}, {3328, 3335}, {3346, 3346}, {3350, 3352},
-		                                                   		{3366, 3366}, {3416, 3416}, {20004, 20032}, {20064, 20092},
-		                                                   		{21413, 21423}, {21473, 21483}, {21896, 21899}, {22171, 22177},
-		                                                   		{22181, 22187}, {22191, 22197}, {25884, 25884}, {27205, 27232},
-		                                                   		{27391, 27398}, {27492, 27492}, {28402, 28432}, {28462, 28492},
-		                                                   		{30161, 30179}, {30800, 30800}, {31251, 31259}, {31275, 31279},
-		                                                   		{31281, 31290}, {31466, 31700}
-		                                                   	};        
+        private static readonly int[,] _latLongCrsRanges = new[,]
+                                                       {
+                                                                   {4001, 4999},
+                                                                   {2044, 2045}, {2081, 2083}, {2085, 2086}, {2093, 2093},
+                                                                   {2096, 2098}, {2105, 2132}, {2169, 2170}, {2176, 2180},
+                                                                   {2193, 2193}, {2200, 2200}, {2206, 2212}, {2319, 2319},
+                                                                   {2320, 2462}, {2523, 2549}, {2551, 2735}, {2738, 2758},
+                                                                   {2935, 2941}, {2953, 2953}, {3006, 3030}, {3034, 3035},
+                                                                   {3058, 3059}, {3068, 3068}, {3114, 3118}, {3126, 3138},
+                                                                   {3300, 3301}, {3328, 3335}, {3346, 3346}, {3350, 3352},
+                                                                   {3366, 3366}, {3416, 3416}, {20004, 20032}, {20064, 20092},
+                                                                   {21413, 21423}, {21473, 21483}, {21896, 21899}, {22171, 22177},
+                                                                   {22181, 22187}, {22191, 22197}, {25884, 25884}, {27205, 27232},
+                                                                   {27391, 27398}, {27492, 27492}, {28402, 28432}, {28462, 28492},
+                                                                   {30161, 30179}, {30800, 30800}, {31251, 31259}, {31275, 31279},
+                                                                   {31281, 31290}, {31466, 31700}
+                                                               };
         private static bool UseLatLon(int wkid)
         {
             int length = _latLongCrsRanges.Length / 2;
@@ -633,15 +638,16 @@ Invalid version!
         }
         private double GetScale(double resolution, double dpi, TilingScheme ts)
         {
-                        if (Math.Abs(ts.TileOrigin.X) > 600)                return resolution * dpi / 2.54 * 100;
-            else            {
+            if (Math.Abs(ts.TileOrigin.X) > 600) return resolution * dpi / 2.54 * 100;
+            else
+            {
                 double meanY = (ts.FullExtent.YMax + ts.FullExtent.YMin) / 2;
-                double R = 6378137 *Math.Cos(meanY / 180 * 3.14);
+                double R = 6378137 * Math.Cos(meanY / 180 * 3.14);
                 double dgreeResolution = 2 * 3.14 * R / 360;
                 return dgreeResolution * resolution * dpi / 2.54 * 100;
             }
         }
-                public static int[] getBoundaryTileCoords(TilingScheme tilingScheme, LODInfo lod)
+        public static int[] getBoundaryTileCoords(TilingScheme tilingScheme, LODInfo lod)
         {
             double x = tilingScheme.TileOrigin.X;
             double y = tilingScheme.TileOrigin.Y;
@@ -666,13 +672,14 @@ Invalid version!
 
         private void CheckEtag(string level, string row, string col)
         {
-                                    if (WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.IfNoneMatch] != null)
+            if (WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.IfNoneMatch] != null)
             {
-                                string etag = WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.IfNoneMatch].Split(new string[] { "\"" }, StringSplitOptions.RemoveEmptyEntries)[0];                try                {
+                string etag = WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.IfNoneMatch].Split(new string[] { "\"" }, StringSplitOptions.RemoveEmptyEntries)[0]; try
+                {
                     string oriEtag = Encoding.UTF8.GetString(Convert.FromBase64String(etag));
                     if (oriEtag == level + row + col)
                     {
-                        WebOperationContext.Current.OutgoingResponse.SuppressEntityBody = true;                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
+                        WebOperationContext.Current.OutgoingResponse.SuppressEntityBody = true; WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
                     }
                 }
                 catch (Exception e)
@@ -683,13 +690,13 @@ Invalid version!
         }
         private void SetEtag(string level, string row, string col)
         {
-            WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddHours(24).ToUniversalTime().ToString("r"));                        string oriEtag = level + row + col;
-                        string etag = Convert.ToBase64String(Encoding.UTF8.GetBytes(oriEtag));
+            WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Expires, DateTime.Now.AddHours(24).ToUniversalTime().ToString("r")); string oriEtag = level + row + col;
+            string etag = Convert.ToBase64String(Encoding.UTF8.GetBytes(oriEtag));
             WebOperationContext.Current.OutgoingResponse.SetETag(etag);
         }
 
-        private Stream StreamFromPlainText(string content, bool disableCache=false)
-        {            
+        private Stream StreamFromPlainText(string content, bool disableCache = false)
+        {
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
             if (disableCache)
             {
@@ -701,11 +708,11 @@ Invalid version!
         }
 
         #region admin api
-        private string AuthenticateAndParseParams(Stream requestBody,out Hashtable ht,bool allowEmptyRequestBody=false)
+        private string AuthenticateAndParseParams(Stream requestBody, out Hashtable ht, bool allowEmptyRequestBody = false)
         {
-                        ht = null;
+            ht = null;
             string authResult = string.Empty;
-                        if (WebOperationContext.Current.IncomingRequest.Method != "POST")
+            if (WebOperationContext.Current.IncomingRequest.Method != "POST")
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.MethodNotAllowed;
                 authResult = @"{
@@ -714,16 +721,16 @@ Invalid version!
 }";
                 return authResult;
             }
-                        if (WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.Authorization] == null)
+            if (WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.Authorization] == null)
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
-                                                                authResult = @"{
+                authResult = @"{
     ""success"": false,
     ""message"": ""Authorization required!""
 }";
                 return authResult;
             }
-                        byte[] bytes = null;
+            byte[] bytes = null;
             try
             {
                 bytes = Convert.FromBase64String(WebOperationContext.Current.IncomingRequest.Headers[HttpRequestHeader.Authorization]);
@@ -738,7 +745,7 @@ Invalid version!
                 return authResult;
             }
             string[] userandpwd = Encoding.UTF8.GetString(bytes).Split(new char[] { ':' });
-                        if (userandpwd.Length != 2)
+            if (userandpwd.Length != 2)
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
                 authResult = @"{
@@ -747,7 +754,7 @@ Invalid version!
 }";
                 return authResult;
             }
-                        if (!PBS.Util.Utility.IsUserAdmin(userandpwd[0], userandpwd[1], "localhost"))
+            if (!PBS.Util.Utility.IsUserAdmin(userandpwd[0], userandpwd[1], "localhost"))
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Unauthorized;
                 authResult = @"{
@@ -756,9 +763,9 @@ Invalid version!
 }";
                 return authResult;
             }
-                                    if (allowEmptyRequestBody && requestBody == null)
+            if (allowEmptyRequestBody && requestBody == null)
                 return string.Empty;
-                                    if (requestBody == null)
+            if (requestBody == null)
             {
                 WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.BadRequest;
                 authResult = @"{
@@ -767,7 +774,7 @@ Invalid version!
 }";
                 return authResult;
             }
-                        string strRequest;
+            string strRequest;
             using (StreamReader sr = new StreamReader(requestBody))
             {
                 strRequest = sr.ReadToEnd();
@@ -787,12 +794,12 @@ Invalid version!
         }
 
         public Stream AddPBSService(Stream requestBody)
-        {            
-            string result=string.Empty;
+        {
+            string result = string.Empty;
             Hashtable htParams = null;
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
             WebOperationContext.Current.OutgoingResponse.ContentType = "text/plain;charset=utf-8";
-            result = AuthenticateAndParseParams(requestBody,out htParams);
+            result = AuthenticateAndParseParams(requestBody, out htParams);
             if (result != string.Empty)
             {
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(result);
@@ -800,7 +807,7 @@ Invalid version!
             }
             else
             {
-                string name,ip, datasourcepath, tilingschemepath;
+                string name, ip, datasourcepath, tilingschemepath;
                 int port;
                 string strDataSourceType;
                 bool allowmemorycache, disableclientcache, displaynodatatile;
@@ -808,7 +815,7 @@ Invalid version!
                 #region parsing params
                 try
                 {
-                                        if (htParams["name"] == null || htParams["port"] == null || htParams["dataSourceType"] == null || htParams["dataSourcePath"] == null)
+                    if (htParams["name"] == null || htParams["port"] == null || htParams["dataSourceType"] == null || htParams["dataSourcePath"] == null)
                     {
                         WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.BadRequest;
                         result = @"{
@@ -833,13 +840,13 @@ Invalid version!
                     WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.BadRequest;
                     result = @"{
     ""success"": false,
-    ""message"": ""request parameters parsing error! "+e.Message+@"""
+    ""message"": ""request parameters parsing error! " + e.Message + @"""
 }";
                     return new MemoryStream(System.Text.Encoding.UTF8.GetBytes(result));
                 }
                 #endregion
-                                                                                                string str=string.Empty;
-                                str = ServiceManager.CreateService(name, ip, port, strDataSourceType, datasourcepath, allowmemorycache, disableclientcache, displaynodatatile, visualstyle, tilingschemepath);
+                string str = string.Empty;
+                str = ServiceManager.CreateService(name, ip, port, strDataSourceType, datasourcepath, allowmemorycache, disableclientcache, displaynodatatile, visualstyle, tilingschemepath);
                 if (str != string.Empty)
                     result = @"{
                     ""success"": false,
@@ -873,7 +880,7 @@ Invalid version!
                 int port;
                 #region parsing params
                 try
-                {        
+                {
                     if (htParams["name"] == null || htParams["port"] == null)
                     {
                         WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.BadRequest;
@@ -898,7 +905,7 @@ Invalid version!
                 #endregion
                 string str = string.Empty;
                 str = ServiceManager.DeleteService(port, name);
-                if (str!=string.Empty)
+                if (str != string.Empty)
                     result = @"{
                     ""success"": false,
                     ""message"": """ + str + @"""
@@ -986,7 +993,7 @@ Invalid version!
             Hashtable htParams = null;
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
             WebOperationContext.Current.OutgoingResponse.ContentType = "text/plain;charset=utf-8";
-            result = AuthenticateAndParseParams(requestBody, out htParams,true);
+            result = AuthenticateAndParseParams(requestBody, out htParams, true);
             if (result != string.Empty)
             {
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(result);
@@ -1091,7 +1098,8 @@ Invalid version!
             }
         }
 
-        public Stream ChangeArcGISDynamicMapServiceParams(Stream requestBody){
+        public Stream ChangeArcGISDynamicMapServiceParams(Stream requestBody)
+        {
             string result = string.Empty;
             Hashtable htParams = null;
             WebOperationContext.Current.OutgoingResponse.Headers["X-Powered-By"] = PBSName;
@@ -1170,7 +1178,7 @@ Invalid version!
                     ""success"": true,
                     ""message"": ""success""
                 }";
-                }                
+                }
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(result);
                 return new MemoryStream(bytes);
             }
