@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Collections.Concurrent;
+using System.Net.Http;
+using System.Diagnostics;
 
 namespace PBS.DataSource
 {
@@ -28,6 +30,7 @@ namespace PBS.DataSource
             _connLocalCacheFile?.Close();
             _connLocalCacheFile = null;
         }
+       
         /// <summary>
         /// 数据类型
         /// </summary>
@@ -48,6 +51,20 @@ namespace PBS.DataSource
         /// </summary>
         public bool IsOnlineMap { get; set; }
 
+        private HttpClient _googleHttpClient;
+        private HttpClient GoogleHttpClient
+        {
+            get
+            {
+                if (_googleHttpClient == null)
+                {
+                    _googleHttpClient = new HttpClient();
+                    _googleHttpClient.DefaultRequestHeaders.TryAddWithoutValidation("Referer", "http://maps.google.com/");
+                    _googleHttpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", @"Mozilla / 5.0(Windows; U; Windows NT 6.0; en - US; rv: 1.9.1.7) Gecko / 20091221 Firefox / 3.5.7");
+                }
+                return _googleHttpClient;
+            }
+        }
         /// <summary>
         /// 初始化
         /// </summary>
@@ -573,10 +590,9 @@ namespace PBS.DataSource
             }
             return !isPredefinedDataSource;
         }
-
-        protected byte[] HttpGetTileBytes(string uri)
+        protected byte[] HttpGetTileBytes1(string uri)
         {            
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri); 
             request.Accept = "*/*";
             request.KeepAlive = true;
             request.Method = "GET";
@@ -585,9 +601,10 @@ namespace PBS.DataSource
             {
                 request.Referer = this.Path + "?f=jsapi";
             }
-            
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
-            
+            request.Referer="http://maps.google.com/";
+            //request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
+            request.UserAgent = @"Mozilla / 5.0(Windows; U; Windows NT 6.0; en - US; rv: 1.9.1.7) Gecko / 20091221 Firefox / 3.5.7";
+
             request.Proxy = null;//==no proxy
             request.Timeout = 20000;
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -597,7 +614,18 @@ namespace PBS.DataSource
                 return Util.Utility.StreamToBytes(response.GetResponseStream());
             }
         }
-
+        protected byte[] HttpGetTileBytes(string uri)
+        {
+            try
+            {
+                return GoogleHttpClient.GetByteArrayAsync(uri).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"下载{uri}失败：{e}");
+                return null;
+            }
+        }
         protected byte[] HttpPostTileBytes(string url, string queryData)
         {
             HttpWebRequest request;
