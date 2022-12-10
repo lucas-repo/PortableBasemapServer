@@ -28,8 +28,10 @@
   </onlinemapsource>
 	<onlinemapsource id="5" desc="谷歌影像">
 		<name>GoogleMapsImagery</name>
-		<!--<url><![CDATA[http://khm{$s}.google.com/kh/v=884&gl=cn&x={$x}&y={$y}&z={$z}]]></url>-->
-    <url><![CDATA[https://mt{$s}.s02.sirenmap.com/vt/lyrs=s&hl=zh-CN&x={$x}&y={$y}&z={$z}&s=Galileo]]></url>
+		<url><![CDATA[https://mt{$s}.s01.bygczhyunone.com/vt/lyrs=s&hl=zh-CN&x={$x}&y={$y}&z={$z}&s=Galileo]]></url>
+		<!--<url><![CDATA[https://khm{$s}.google.com/kh/v=884&gl=cn&x={$x}&y={$y}&z={$z}]]></url>-->
+		<!--<url><![CDATA[https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s%40781&hl=zh-CN&gl=CN&x={$x}&y={$y}&z={$z}&src=app&scale=2&from=app]]></url>-->
+		
 		<servers>0,1,2,3</servers>
 	</onlinemapsource>
   <onlinemapsource id="6" desc="谷歌标注影像">
@@ -39,7 +41,8 @@
   </onlinemapsource>
   <onlinemapsource id="7" desc="谷歌标注">
     <name>GoogleMapsLabel</name>
-    <url><![CDATA[https://mt{$s}.google.cn/vt/lyrs=h&hl=zh-CN&x={$x}&y={$y}&z={$z}&s=Galileo]]></url>
+    <!--<url><![CDATA[https://mt{$s}.google.cn/vt/lyrs=h&hl=zh-CN&x={$x}&y={$y}&z={$z}&s=Galileo]]></url>-->
+	  <url><![CDATA[https://gac-geo.googlecnapps.cn/maps/vt?lyrs=h&hl=zh-CN&gl=CN&x={$x}&y={$y}&z={$z}&scale=2&from=appp]]></url>
     <servers>0,1,2,3</servers>
   </onlinemapsource>
 
@@ -63,43 +66,49 @@
 		<url><![CDATA[http://img.ditu.aliyun.com/get_png?v=v4&x={$x}&y={$y}&z={$z}]]></url>
 		<servers></servers>
 	</onlinemapsource>
-	<onlinemapsource id="12">
+	<onlinemapsource id="12" desc="MapBox影像">
+		<name>MapBoxImage</name>
+		<url>
+			<![CDATA[https://api.mapbox.com/v4/mapbox.satellite/{$z}/{$x}/{$y}.jpg90?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA]]></url>
+		<servers>a,b,c,d</servers>
+	</onlinemapsource>
+	<onlinemapsource id="13">
 		<name>MapBoxPopulationFire</name>
 		<url><![CDATA[http://{$s}.tiles.mapbox.com/v3/aj.population-fire/{$z}/{$x}/{$y}.png]]></url>
 		<servers>a,b,c,d</servers>
 	</onlinemapsource>
-  <onlinemapsource id="13">
+	<onlinemapsource id="14">
     <name>360map</name>
     <url><![CDATA[http://webrd0{$s}.is.autonavi.com/appmaptile?x={$x}&y={$y}&z={$z}&lang=zh_cn&size=1&scale=1&style=7]]></url>
     <servers>1,2,3,4</servers>
   </onlinemapsource>
-  <onlinemapsource id="14">
+  <onlinemapsource id="15">
     <name>GeoQ</name>
     <url><![CDATA[http://www.arcgisonline.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{$z}/{$y}/{$x}]]></url>
     <servers></servers>
   </onlinemapsource>
-  <onlinemapsource id="15">
+  <onlinemapsource id="16">
     <name>MapBox</name>
     <url><![CDATA[http://{$s}.tiles.mapbox.com/v3/diligentpig.map-9omksd0n/{$z}/{$x}/{$y}.png]]></url>
     <servers>a,b,c,d</servers>
   </onlinemapsource>
   
-  <onlinemapsource id="16" desc="天地图街道">
+  <onlinemapsource id="17" desc="天地图街道">
     <name>TiandituStreet</name>
-    <url><![CDATA[http://t{$s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={$z}&TILEROW={$y}&TILECOL={$x}&tk=c7e58f24c4bed95a1c890a224a25eeb0"]]></url>
+	  <url><![CDATA[https://t{$s}.tianditu.gov.cn/DataServer?T=vec_w&x={$x}&y={$y}&l={$z}&tk=88b666f44bb8642ec5282ad2a9915ec5]]></url>
     <servers>0,1,2,3,4,5,6,7</servers>
   </onlinemapsource>
-  <onlinemapsource id="17" desc="天地图街道注记">
+  <onlinemapsource id="18" desc="天地图街道注记">
     <name>TiandituStreetAnno</name>
-    <url><![CDATA[http://t{$s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={$z}&TILEROW={$y}&TILECOL={$x}&tk=c7e58f24c4bed95a1c890a224a25eeb0"]]></url>
+	  <url><![CDATA[https://t{$s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={$x}&TILEROW={$y}&TILEMATRIX={$z}&tk=88b666f44bb8642ec5282ad2a9915ec5]]></url>
     <servers>0,1,2,3,4,5,6,7</servers>
   </onlinemapsource>
-  <onlinemapsource id="18" desc="天地图影像">
+  <onlinemapsource id="19" desc="天地图影像">
     <name>TiandituSatellite</name>
     <url><![CDATA[http://t{$s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={$z}&TILEROW={$y}&TILECOL={$x}&tk=c7e58f24c4bed95a1c890a224a25eeb0"]]></url>
     <servers>0,1,2,3,4,5,6,7</servers>
   </onlinemapsource>
-  <onlinemapsource id="19" desc="天地图影像注记">
+  <onlinemapsource id="20" desc="天地图影像注记">
     <name>TiandituSatelliteAnno</name>
     <url><![CDATA[https://t{$s}.tianditu.gov.cn/DataServer?T=img_w&x={$x}&y={$y}&l={$z}&tk=88b666f44bb8642ec5282ad2a9915ec5]]></url>
     <servers>0,1,2,3,4,5,6,7</servers>
